@@ -97,6 +97,7 @@ DEB_ARCH              := iphoneos-arm
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := aarch64-apple-ios
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64-apple-ios$(IPHONEOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?=
@@ -117,6 +118,7 @@ DEB_ARCH              := iphoneos-arm64
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := aarch64-apple-ios
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64-apple-ios$(IPHONEOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?= /var/jb
@@ -137,6 +139,7 @@ DEB_ARCH              := iphoneos-arm64e
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := aarch64-apple-ios
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64-apple-ios$(IPHONEOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?= /rootfs
 MEMO_PREFIX           ?=
@@ -157,6 +160,7 @@ DEB_ARCH              := iphoneos-arm64e
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := aarch64-apple-ios
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64e-apple-ios$(IPHONEOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?= /var/jb
@@ -177,6 +181,7 @@ DEB_ARCH              := iphoneos-arm64e
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := aarch64-apple-ios
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64e-apple-ios$(IPHONEOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?= /rootfs
 MEMO_PREFIX           ?=
@@ -196,6 +201,7 @@ DEB_ARCH              := iphoneos-arm64e
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := aarch64-apple-ios
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64e-apple-ios$(IPHONEOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?=
@@ -215,6 +221,7 @@ DEB_ARCH              := iphoneos-arm
 GNU_HOST_TRIPLE       := armv7-apple-darwin
 PLATFORM_VERSION_MIN  := -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := armv7-apple-ios
+GOLANG_OS             := ios
 LLVM_TARGET           := armv7-apple-ios$(IPHONEOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?=
@@ -234,6 +241,7 @@ DEB_ARCH              := appletvos-arm64
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := -mappletvos-version-min=$(APPLETVOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := aarch64-apple-tvos
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64-apple-tvos$(APPLETVOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?=
@@ -253,6 +261,7 @@ DEB_ARCH              := appletvos-arm64e
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := -mappletvos-version-min=$(APPLETVOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := aarch64-apple-tvos
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64e-apple-tvos$(APPLETVOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?=
@@ -291,6 +300,7 @@ DEB_ARCH              := bridgeos-arm64
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := --target=arm64-apple-bridgeos$(BRIDGEOS_DEPLOYMENT_TARGET)
 RUST_TARGET           := aarch64-apple-bridgeos
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64-apple-bridgeos$(BRIDGEOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?=
@@ -309,7 +319,8 @@ PLATFORM              := watchos
 DEB_ARCH              := watchos-arm64-32
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 PLATFORM_VERSION_MIN  := -mwatchos-version-min=$(WATCHOS_DEPLOYMENT_TARGET)
-RUST_TARGET           := aarch64-apple-watchos
+RUST_TARGET           := arm64_32-apple-watchos
+GOLANG_OS             := ios
 LLVM_TARGET           := arm64_32-apple-watchos$(WATCHOS_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?=
@@ -348,13 +359,14 @@ PLATFORM              := macosx
 DEB_ARCH              := darwin-arm64e
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 RUST_TARGET           := $(GNU_HOST_TRIPLE)
+GOLANG_OS             := darwin
 LLVM_TARGET           := arm64e-apple-macos$(MACOSX_DEPLOYMENT_TARGET)
 PLATFORM_VERSION_MIN  := -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?= /opt/procursus
 MEMO_SUB_PREFIX       ?=
 MEMO_ALT_PREFIX       ?=
-MEMO_LINK_PREFIX      ?=
+MEMO_LINK_PREFIX      ?= $(MEMO_PREFIX)
 MEMO_LAUNCHCTL_PREFIX ?=
 GNU_PREFIX            := g
 ON_DEVICE_SDK_PATH    := /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
@@ -368,13 +380,14 @@ PLATFORM              := macosx
 DEB_ARCH              := darwin-arm64
 GNU_HOST_TRIPLE       := aarch64-apple-darwin
 RUST_TARGET           := $(GNU_HOST_TRIPLE)
+GOLANG_OS             := darwin
 LLVM_TARGET           := arm64-apple-macos$(MACOSX_DEPLOYMENT_TARGET)
 PLATFORM_VERSION_MIN  := -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?= /opt/procursus
 MEMO_SUB_PREFIX       ?=
 MEMO_ALT_PREFIX       ?=
-MEMO_LINK_PREFIX      ?=
+MEMO_LINK_PREFIX      ?= $(MEMO_PREFIX)
 MEMO_LAUNCHCTL_PREFIX ?=
 GNU_PREFIX            := g
 ON_DEVICE_SDK_PATH    := /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
@@ -388,13 +401,14 @@ PLATFORM              := macosx
 DEB_ARCH              := darwin-amd64
 GNU_HOST_TRIPLE       := x86_64-apple-darwin
 RUST_TARGET           := $(GNU_HOST_TRIPLE)
+GOLANG_OS             := darwin
 LLVM_TARGET           := x86_64-apple-macos$(MACOSX_DEPLOYMENT_TARGET)
 PLATFORM_VERSION_MIN  := -mmacosx-version-min=$(MACOSX_DEPLOYMENT_TARGET)
 MEMO_ROOTFS           ?=
 MEMO_PREFIX           ?= /opt/procursus
 MEMO_SUB_PREFIX       ?=
 MEMO_ALT_PREFIX       ?=
-MEMO_LINK_PREFIX      ?=
+MEMO_LINK_PREFIX      ?= $(MEMO_PREFIX)
 MEMO_LAUNCHCTL_PREFIX ?=
 GNU_PREFIX            := g
 ON_DEVICE_SDK_PATH    := /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
@@ -414,6 +428,7 @@ ifeq ($(UNAME),Linux)
 ifneq ($(MEMO_QUIET),1)
 $(warning Building on GNU Linux)
 endif # ($(MEMO_QUIET),1)
+
 TARGET_SYSROOT  ?= $(HOME)/cctools/SDK/$(BARE_PLATFORM).sdk
 MACOSX_SYSROOT  ?= $(HOME)/cctools/SDK/MacOSX.sdk
 
@@ -486,7 +501,7 @@ CXXFLAGS_FOR_BUILD := $(CFLAGS_FOR_BUILD)
 ASFLAGS_FOR_BUILD  := $(CFLAGS_FOR_BUILD)
 LDFLAGS_FOR_BUILD  := $(CFLAGS_FOR_BUILD)
 
-else
+else # ($(shell sw_vers -productName),macOS)
 ifneq ($(MEMO_QUIET),1)
 $(warning Building on iOS)
 endif # ($(MEMO_QUIET),1)
@@ -503,7 +518,7 @@ CXXFLAGS_FOR_BUILD := $(CFLAGS_FOR_BUILD)
 ASFLAGS_FOR_BUILD  := $(CFLAGS_FOR_BUILD)
 LDFLAGS_FOR_BUILD  := $(CFLAGS_FOR_BUILD)
 
-endif
+endif # ($(shell sw_vers -productName),macOS)
 AR              != command -v ar
 LD              != command -v ld
 RANLIB          != command -v ranlib
@@ -515,7 +530,7 @@ OTOOL           != command -v otool
 I_N_T           != command -v install_name_tool
 LIBTOOL         != command -v libtool
 
-else
+else #ifeq ($(UNAME),Darwin)
 $(error Please use macOS, iOS, Linux, or FreeBSD to build)
 endif
 
@@ -523,6 +538,8 @@ CC_FOR_BUILD  := $(shell command -v cc) $(CFLAGS_FOR_BUILD)
 CPP_FOR_BUILD := $(shell command -v cc) -E $(CPPFLAGS_FOR_BUILD)
 CXX_FOR_BUILD := $(shell command -v c++) $(CXXFLAGS_FOR_BUILD)
 AR_FOR_BUILD  := $(shell command -v ar)
+RANLIB_FOR_BUILD := $(shell command -v ranlib)
+STRIP_FOR_BUILD := $(shell command -v strip)
 export CC_FOR_BUILD CPP_FOR_BUILD CXX_FOR_BUILD AR_FOR_BUILD
 
 DEB_MAINTAINER    ?= roothide <roothideDev@twitter>
@@ -662,6 +679,9 @@ BUILD_CONFIGURE_FLAGS := \
 	CC="$(CC_FOR_BUILD)" \
 	CXX="$(CXX_FOR_BUILD)" \
 	CPP="$(CPP_FOR_BUILD)" \
+	AR="$(AR_FOR_BUILD)" \
+	RANLIB="$(RANLIB_FOR_BUILD)" \
+	STRIP="$(STRIP_FOR_BUILD)" \
 	CFLAGS="$(CFLAGS_FOR_BUILD)" \
 	CXXFLAGS="$(CXXFLAGS_FOR_BUILD)" \
 	CPPFLAGS="$(CPPFLAGS_FOR_BUILD)" \
@@ -786,7 +806,7 @@ CHECKSUM_VERIFY = if [ "$(1)" = "sha1" -o "$(1)" = "sha1sum" ]; then \
 			[ "$(3)" = "$$HASH" ] || (echo "$(2) - Invalid Hash" && exit 1); \
 		fi
 
-EXTRACT_TAR = -if [ ! -d $(BUILD_WORK)/$(3) ] || [ "$(4)" = "1" ]; then \
+EXTRACT_TAR = if [ ! -d $(BUILD_WORK)/$(3) ] || [ "$(4)" = "1" ]; then \
 		if [ -d $(BUILD_ROOT)/source-repo/$(1)_$(2) ]; then \
 			echo "using patched source: $(1) $(2)"; \
 			mkdir -p $(BUILD_WORK)/$(3); \
@@ -797,7 +817,7 @@ EXTRACT_TAR = -if [ ! -d $(BUILD_WORK)/$(3) ] || [ "$(4)" = "1" ]; then \
 			cp -a $(BUILD_ROOT)/source-temp/$(1)_$(2)/. $(BUILD_WORK)/$(3); \
 		else \
 			cd $(BUILD_WORK) && \
-			tar -xf $(BUILD_SOURCE)/$(1) && \
+			tar -xf $(BUILD_SOURCE)/$(1) || exit 1 && \
 			mkdir -p $(3); \
 			cp -a $(2)/. $(3); \
 	 		cp -a $(2)/. $(BUILD_ROOT)/source-temp/$(1)_$(2); \
@@ -807,13 +827,15 @@ EXTRACT_TAR = -if [ ! -d $(BUILD_WORK)/$(3) ] || [ "$(4)" = "1" ]; then \
 
 DOWNLOAD_FILE = if [ ! -f "$(1)" ]; then \
 					echo "Downloading $(2) => $(1)"; \
+					TEMP_FILE=$$(mktemp); \
 					if [ -z "$$LIST" ]; then \
 						$(CURL) --output \
-							$(1) $(2) ; \
+							$$TEMP_FILE $(2) || exit 1; \
 					else \
 						$(CURL) --output \
-							$(1) $(2) ; \
+							$$TEMP_FILE $(2) || exit 1; \
 					fi; \
+					mkdir -p $$(dirname "$(1)") && mv $$TEMP_FILE "$(1)"; \
 				else echo "$(1) already downloaded."; fi
 
 DOWNLOAD_FILES = LIST="$$(echo $(2))"; \
@@ -1021,12 +1043,12 @@ PACK = \
 	cp -a $(BUILD_DIST)/$(1) $(BUILD_ROOT)/pack-cache/$(MEMO_TARGET)/$(MEMO_CFVER)/; \
 	$(FAKEROOT) $(DPKG_DEB) -b $(BUILD_DIST)/$(1) $(BUILD_DIST)/../$$(echo $@ | sed 's/-package//')/$$(grep Package: $(BUILD_DIST)/$(1)/DEBIAN/control | cut -f2 -d ' ')_$($(2))_$$(grep Architecture: $(BUILD_DIST)/$(1)/DEBIAN/control | cut -f2 -d ' ').deb
 
-GITHUB_ARCHIVE = -if [ "x$(5)" != "x" ]; then \
-					[ ! -f "$(BUILD_SOURCE)/$(5)-$(3).tar.gz" ] && \
+GITHUB_ARCHIVE = if [ "x$(5)" != "x" ]; then \
+					([ ! -f "$(BUILD_SOURCE)/$(5)-$(3).tar.gz" ] || exit 0) && \
 						$(call DOWNLOAD_FILE,$(BUILD_SOURCE)/$(5)-$(3).tar.gz, \
 							https://github.com/$(1)/$(2)/archive/$(4).tar.gz); \
 				else \
-					[ ! -f "$(BUILD_SOURCE)/$(2)-$(3).tar.gz" ] && \
+					([ ! -f "$(BUILD_SOURCE)/$(2)-$(3).tar.gz" ] || exit 0) && \
 						$(call DOWNLOAD_FILE,$(BUILD_SOURCE)/$(2)-$(3).tar.gz, \
 							https://github.com/$(1)/$(2)/archive/$(4).tar.gz); \
 				fi
@@ -1044,7 +1066,7 @@ GIT_CLONE = if [ ! -d "$(BUILD_WORK)/$(3)" ]; then \
 ifneq ($(call HAS_COMMAND,curl),1)
 $(error Install curl)
 else
-CURL := curl --silent -L --create-dirs
+CURL := curl --fail -L --create-dirs
 endif
 
 ifneq ($(call HAS_COMMAND,triehash),1)

@@ -7,9 +7,9 @@ SUBPROJECTS        += uikittools
 else
 STRAPPROJECTS      += uikittools
 endif
-UIKITTOOLS_COMMIT  := 55dc95a8a2fcbe83d1c683c4adbda8276e87d009
+UIKITTOOLS_COMMIT  := f2c0e7aa11fadde365abd3d3e312b47bba23f332
 UIKITTOOLS_VERSION := 2.1.6
-DEB_UIKITTOOLS_V   ?= $(UIKITTOOLS_VERSION)-2
+DEB_UIKITTOOLS_V   ?= $(UIKITTOOLS_VERSION)-4
 
 uikittools-setup: setup
 	$(call GITHUB_ARCHIVE,roothide,uikittools-ng,$(UIKITTOOLS_COMMIT),$(UIKITTOOLS_COMMIT))
