@@ -3,7 +3,7 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS    += hidapi
-HIDAPI_VERSION := 0.9.0
+HIDAPI_VERSION := 0.15.0
 DEB_HIDAPI_V   ?= $(HIDAPI_VERSION)
 
 hidapi-setup: setup
@@ -15,11 +15,11 @@ hidapi:
 	@echo "Using previously built hidapi."
 else
 hidapi: hidapi-setup
-	cd $(BUILD_WORK)/hidapi && ./bootstrap
-	cd $(BUILD_WORK)/hidapi && ./configure -C \
-		$(DEFAULT_CONFIGURE_FLAGS)
-	+$(MAKE) -C $(BUILD_WORK)/hidapi install \
-		CFLAGS="$(CFLAGS) -D__OPEN_SOURCE__ -DMAC_OS_X_VERSION_MIN_REQUIRED=101500" \
+	mkdir $(BUILD_WORK)/hidapi/build
+	cd $(BUILD_WORK)/hidapi/build && cmake .. \
+		$(DEFAULT_CMAKE_FLAGS)
+	+$(MAKE) -C $(BUILD_WORK)/hidapi/build
+	+$(MAKE) -C $(BUILD_WORK)/hidapi/build install \
 		DESTDIR="$(BUILD_STAGE)/hidapi"
 	$(call AFTER_BUILD,copy)
 endif
@@ -30,11 +30,11 @@ hidapi-package: hidapi-stage
 	mkdir -p $(BUILD_DIST)/libhidapi{0,-dev}/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
 
 	# hidapi.mk Prep libhidapi0
-	cp -a $(BUILD_STAGE)/hidapi/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/libhidapi.0.dylib $(BUILD_DIST)/libhidapi0/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
+	cp -a $(BUILD_STAGE)/hidapi/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/libhidapi{.,.0.,.0.15.0.}dylib $(BUILD_DIST)/libhidapi0/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
 
 	# hidapi.mk Prep libhidapi-dev
-	cp -a $(BUILD_STAGE)/hidapi/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/{pkgconfig,libhidapi.{a,dylib}} $(BUILD_DIST)/libhidapi-dev/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
-	cp -a $(BUILD_STAGE)/hidapi/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include $(BUILD_DIST)/libhidapi-dev/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)
+	cp -a $(BUILD_STAGE)/hidapi/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/{cmake,pkgconfig} $(BUILD_DIST)/libhidapi-dev/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
+	cp -a $(BUILD_STAGE)/hidapi/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/* $(BUILD_DIST)/libhidapi-dev/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include
 
 	# hidapi.mk Sign
 	$(call SIGN,libhidapi0,general.xml)
