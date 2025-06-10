@@ -20,7 +20,18 @@ qt: qt-setup
 	# Build for macos first, since this version won't probably match the system one
 	cd $(BUILD_WORK)/qt/build-macos && ../configure \
 		-prefix $(BUILD_WORK)/qt/macos-qt \
-		-release
+		-release \
+		CC="$(CC_FOR_BUILD)" \
+		CXX="$(CXX_FOR_BUILD)" \
+		CPP="$(CPP_FOR_BUILD)" \
+		AR="$(AR_FOR_BUILD)" \
+		RANLIB="$(RANLIB_FOR_BUILD)" \
+		STRIP="$(STRIP_FOR_BUILD)" \
+		CFLAGS="$(CFLAGS_FOR_BUILD)" \
+		CXXFLAGS="$(CXXFLAGS_FOR_BUILD)" \
+		CPPFLAGS="$(CPPFLAGS_FOR_BUILD)" \
+		ASFLAGS="$(ASFLAGS_FOR_BUILD)" \
+		LDFLAGS="$(LDFLAGS_FOR_BUILD)"
 	cmake --build $(BUILD_WORK)/qt/build-macos --parallel
 	cmake --install $(BUILD_WORK)/qt/build-macos
 
