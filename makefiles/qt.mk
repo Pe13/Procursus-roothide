@@ -9,18 +9,29 @@ DEB_QT_V      ?= $(QT_VERSION)
 qt-setup: setup
 	$(call GITHUB_ARCHIVE,qt,qtbase,$(QT_VERSION),$(QT_VERSION))
 	$(call EXTRACT_TAR,qtbase-$(QT_VERSION).tar.gz,qtbase-$(QT_VERSION),qt)
-	mkdir -p $(BUILD_WORK)/qt/build
+	mkdir -p $(BUILD_WORK)/qt/build-macos
+	mkdir -p $(BUILD_WORK)/qt/build-ios
 
 ifneq ($(wildcard $(BUILD_WORK)/qt/.build_complete),)
 qt:
 	@echo "Using previously built qt."
 else
 qt: qt-setup
-	cd $(BUILD_WORK)/qt/build && ../configure \
+	# Build for macos first, since this version won't probably match the system one
+	cd $(BUILD_WORK)/qt/build-macos && ../configure \
+		-prefix $(BUILD_WORK)/qt/macos-qt \
+		-release
+	cmake --build $(BUILD_WORK)/qt/build-macos --parallel
+	cmake --install $(BUILD_WORK)/qt/build-macos
+
+	# Finally built Qt for iOS
+	cd $(BUILD_WORK)/qt/build-ios && ../configure \
 		-platform macx-ios-clang -release \
-		-qt-host-path /usr/local/Cellar/qt/6.9.0 \
-		-sdk iphoneos
-	cmake --build $(BUILD_WORK)/qt/build --parallel
+		-qt-host-path $(BUILD_WORK)/qt/macos-qt \
+		-sdk iphoneos \
+		-prefix $(BUILD_STAGE)/qt
+	cmake --build $(BUILD_WORK)/qt/build-ios --parallel
+	cmake --install $(BUILD_WORK)/qt/build-ios
 	$(call AFTER_BUILD,copy)
 endif
 
