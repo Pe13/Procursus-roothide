@@ -9,7 +9,6 @@ DEB_QT_V      ?= $(QT_VERSION)
 qt-setup: setup
 	$(call GITHUB_ARCHIVE,qt,qtbase,$(QT_VERSION),$(QT_VERSION))
 	$(call EXTRACT_TAR,qtbase-$(QT_VERSION).tar.gz,qtbase-$(QT_VERSION),qt)
-	#$(call DO_PATCH,qt,qt,-p1)
 	mkdir -p $(BUILD_WORK)/qt/build
 
 ifneq ($(wildcard $(BUILD_WORK)/qt/.build_complete),)
@@ -19,7 +18,8 @@ else
 qt: qt-setup
 	cd $(BUILD_WORK)/qt/build && ../configure \
 		-platform macx-ios-clang -release \
-		-qt-host-path /usr/local/Cellar/qt
+		-qt-host-path /usr/local/Cellar/qt/6.9.0 \
+		-sdk iphoneos
 	cmake --build $(BUILD_WORK)/qt/build --parallel
 	$(call AFTER_BUILD,copy)
 endif
