@@ -23,4 +23,5 @@ export LIBRARY_PATH="$LIBRARY_PATH:/opt/procursus/lib"
 sudo apt update
 sudo apt full-upgrade
 
+cd ..
 rm -r procursus_tmp
