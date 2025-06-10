@@ -8,7 +8,7 @@ DEB_QT_V      ?= $(QT_VERSION)
 
 qt-setup: setup
 	$(call GITHUB_ARCHIVE,qt,qtbase,$(QT_VERSION),$(QT_VERSION))
-	$(call EXTRACT_TAR,qt-$(QT_VERSION).tar.gz,qt-$(QT_VERSION),qt)
+	$(call EXTRACT_TAR,qtbase-$(QT_VERSION).tar.gz,qtbase-$(QT_VERSION),qt)
 	#$(call DO_PATCH,qt,qt,-p1)
 	mkdir -p $(BUILD_WORK)/qt/build
 
