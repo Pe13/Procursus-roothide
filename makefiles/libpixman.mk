@@ -20,7 +20,7 @@ libpixman: libpixman-setup
 		--disable-dependency-tracking \
 		--disable-gtk \
 		--disable-silent-rules
-	+$(MAKE) -C $(BUILD_WORK)/libpixman
+	+$(MAKE) -C $(BUILD_WORK)/libpixman CFLAGS="$(CFLAGS) -Wno-error=incompatible-function-pointer-types"
 	+$(MAKE) -C $(BUILD_WORK)/libpixman install \
 		DESTDIR=$(BUILD_STAGE)/libpixman
 	$(call AFTER_BUILD,copy)
