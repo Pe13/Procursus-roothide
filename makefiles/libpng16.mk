@@ -3,15 +3,15 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS      += libpng16
-LIBPNG16_VERSION := 1.6.37
+LIBPNG16_VERSION := 1.6.48
 DEB_LIBPNG16_V   ?= $(LIBPNG16_VERSION)-2
 
 libpng16-setup: setup
-	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://sourceforge.net/projects/libpng/files/libpng16/$(LIBPNG16_VERSION)/libpng-$(LIBPNG16_VERSION).tar.xz)
+	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://download.sourceforge.net/libpng/libpng-$(LIBPNG16_VERSION).tar.xz)
 	$(call EXTRACT_TAR,libpng-$(LIBPNG16_VERSION).tar.xz,libpng-$(LIBPNG16_VERSION),libpng16)
 	# Fix the .pc file to use Apple's zlib
 	#sed -i 's/Requires: zlib/Requires: /;s/\(Libs:.*\)/\1 -lz/' $(BUILD_WORK)/libpng16/libpng.pc.in
-	$(call DO_PATCH,libpng16,libpng16,-p1)
+	#$(call DO_PATCH,libpng16,libpng16,-p1)
 
 ifneq ($(wildcard $(BUILD_WORK)/libpng16/.build_complete),)
 libpng16:
