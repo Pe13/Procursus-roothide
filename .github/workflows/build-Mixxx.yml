@@ -16,8 +16,8 @@ jobs:
     runs-on: macos-14
     if: github.ref == 'refs/heads/Mixxx'
     env:
-      CACHE_PATH: /usr/local/opt/__procursus_cache
-      BUILD_CACHE_PATH: /usr/local/opt/__build_cache
+      CACHE_PATH: ${{ github.workspace }}/__procursus_cache
+      BUILD_CACHE_PATH: ${{ github.workspace }}/__build_cache
       XCODE_ROOT: /Applications/Xcode_15.2.app
     steps:
       - name: Checkout Procursus repo
@@ -33,8 +33,8 @@ jobs:
       - name: Restore Procursus cache
         if: steps.procursus-cache.outputs.cache-hit == 'true'
         run: |
-          sudo mkdir -p ${{ inputs.cache-path }}/procursus/var/cache/apt/archives/partial \
-            ${{ inputs.cache-path }}/procursus/var/lib/apt/lists/partial
+          mkdir -p ${{ env.CACHE_PATH }}/procursus/var/cache/apt/archives/partial \
+            ${{ env.CACHE_PATH }}/procursus/var/lib/apt/lists/partial
           sudo rsync -aWlHh --inplace ${{ env.CACHE_PATH }}/procursus /opt
 
       - name: Check if cache was restored
@@ -69,8 +69,8 @@ jobs:
 
       - name: Create the new Procursus cache
         run: |
-          sudo mkdir -p ${{ env.CACHE_PATH }}
-          sudo rsync -alHh --inplace /opt/procursus ${{ env.CACHE_PATH }}
+          mkdir -p ${{ env.CACHE_PATH }}
+          sudo rsync -alHh /opt/procursus ${{ env.CACHE_PATH }}
           sudo rm -rf ${{ env.CACHE_PATH }}/procursus/var/cache/apt/archives/partial \
             ${{ env.CACHE_PATH }}/procursus/var/lib/apt/lists/partial \
             ${{ env.CACHE_PATH }}/procursus/Library/dpkg/triggers/Lock \
@@ -89,7 +89,6 @@ jobs:
 
       - name: Select Xcode version
         run: |
-          sudo xcode-select -s "${{ env.XCODE_ROOT }}"
           echo "==> Build environment"
           xcode-select -p
           xcrun --show-sdk-version
@@ -106,27 +105,23 @@ jobs:
       - name: Restore build cache
         if: steps.build-cache.outputs.cache-hit == 'true'
         run: |
-          sudo rsync -aWlHh --inplace ${{ env.BUILD_CACHE_PATH }} ${{ github.workspace }}
+          rsync -aWlHh --inplace ${{ env.BUILD_CACHE_PATH }} ${{ github.workspace }}
 
       - name: Configure Mixxx
         run: cd ${{ github.workspace }}; make mixxx NO_PGP=1
-
-      - name: Create build_work archive
-        if: always()
-        run: zip -r ${{ github.workspace }}/build_work.zip ${{ github.workspace }}/build_work/iphoneos-arm64/1700/
 
       - name: Upload build_work archive
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: build_work
-          path: ${{ github.workspace }}/build_work.zip
+          path: ${{ github.workspace }}/build_work/iphoneos-arm64/1700/
 
       - name: Create the new build cache
         if: always()
         run: |
           mkdir -p ${{ env.BUILD_CACHE_PATH }}
-          rsync -avlhH \
+          rsync -alhH \
             --prune-empty-dirs \
             --include='build_base/iphoneos-arm64/1700/**' \
             --include='build_work/iphoneos-arm64/1700/**/.build_complete' \
