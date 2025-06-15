@@ -1,0 +1,37 @@
+name: Build Mixxx
+on:
+  push:
+    branches:
+      - Mixxx
+  workflow_dispatch:
+
+#env:
+#  VCPKG_ROOT: '${{ github.workspace }}/vcpkg'
+#  MIXXX_ROOT: '${{ github.workspace }}/mixxx'
+#  SCRIPTS_ROOT: '${{ github.workspace }}/scripts'
+#  PREBUILT_ROOT: '${{ github.workspace }}/prebuilt'
+
+jobs:
+  build-mixxx:
+    runs-on: macos-14
+    if: github.ref == 'refs/heads/Mixxx'
+    env:
+      XCODE_ROOT: /Applications/Xcode_15.2.app
+    steps:
+      - name: Prepare system
+        uses: beerpiss/procursus-action@main
+        with:
+          packages: autoconf automake autopoint bash bison cmake docbook-xml docbook-xsl fakeroot findutils flex gawk git gnupg groff gzip ldid libtool make meson ncurses-bin openssl patch pkg-config po4a python3 sed tar triehash wget xz-utils zstd
+      - run: |
+          sudo xcode-select -s "${{ env.XCODE_ROOT }}"
+          echo "==> Build environment"
+          xcode-select -p
+          xcrun --show-sdk-version
+      - run: echo "An updated Procursus build environment has been installed"
+
+      - name: Checkout Procursus repo
+        uses: actions/checkout@v4
+      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: Configure Mixxx
+        run: make mixxx
