@@ -23,12 +23,19 @@ jobs:
       - name: Checkout Procursus repo
         uses: actions/checkout@v4
 
-      - name: Restore Procursus cache
+      - name: Download Procursus cache
         uses: actions/cache@v3
         id: procursus-cache
         with:
           path: ${{ env.CACHE_PATH }}
           key: procursus
+
+      - name: Restore Procursus cache
+        if: steps.procursus-cache.outputs.cache-hit == 'true'
+        run: |
+          sudo mkdir -p ${{ inputs.cache-path }}/procursus/var/cache/apt/archives/partial \
+            ${{ inputs.cache-path }}/procursus/var/lib/apt/lists/partial
+          sudo rsync -aWlHh --inplace ${{ env.CACHE_PATH }}/procursus /opt
 
       - name: Check if cache was restored
         run: |
@@ -89,12 +96,17 @@ jobs:
           echo "PATH = $PATH"
           echo "An updated Procursus build environment has been installed"
 
-      - name: Restore build cache
+      - name: Download build cache
         uses: actions/cache@v3
         id: build-cache
         with:
           path: ${{ env.BUILD_CACHE_PATH }}
           key: procursus-build
+
+      - name: Restore build cache
+        if: steps.build-cache.outputs.cache-hit == 'true'
+        run: |
+          sudo rsync -aWlHh --inplace ${{ env.BUILD_CACHE_PATH }} ${{ github.workspace }}
 
       - name: Configure Mixxx
         run: cd ${{ github.workspace }}; make mixxx NO_PGP=1
@@ -113,6 +125,7 @@ jobs:
       - name: Create the new build cache
         if: always()
         run: |
+          mkdir -p ${{ env.BUILD_CACHE_PATH }}
           rsync -avlhH \
             --prune-empty-dirs \
             --include='build_base/iphoneos-arm64/1700/**' \
