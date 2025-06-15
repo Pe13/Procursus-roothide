@@ -21,7 +21,7 @@ export PATH="/opt/procursus/bin:/opt/procursus/sbin:/opt/procursus/games:$PATH"
 export CPATH="$CPATH:/opt/procursus/include"
 export LIBRARY_PATH="$LIBRARY_PATH:/opt/procursus/lib"
 sudo apt update
-sudo apt full-upgrade
+sudo apt full-upgrade -y
 
 cd ..
 rm -r procursus_tmp

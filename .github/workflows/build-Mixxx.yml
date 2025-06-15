@@ -16,22 +16,114 @@ jobs:
     runs-on: macos-14
     if: github.ref == 'refs/heads/Mixxx'
     env:
+      CACHE_PATH: /usr/local/opt/__procursus_cache
+      BUILD_CACHE_PATH: /usr/local/opt/__build_cache
       XCODE_ROOT: /Applications/Xcode_15.2.app
     steps:
-      - name: Prepare system
-        uses: beerpiss/procursus-action@main
+      - name: Checkout Procursus repo
+        uses: actions/checkout@v4
+
+      - name: Restore Procursus cache
+        uses: actions/cache@v3
+        id: procursus-cache
         with:
-          packages: autoconf automake autopoint bash bison cmake docbook-xml docbook-xsl fakeroot findutils flex gawk git gnupg groff gzip ldid libtool make meson ncurses-bin openssl patch pkg-config po4a python3 sed tar triehash wget xz-utils zstd
-      - run: |
+          path: ${{ env.CACHE_PATH }}
+          key: procursus
+
+      - name: Check if cache was restored
+        run: |
+          echo \
+            "procursus_bootstrapped=$(if [[ -e '/opt/procursus/.procursus_strapped' ]]; then echo 'true'; else echo 'false'; fi)" >> $GITHUB_OUTPUT
+
+      - name: Prepare Procursus tools
+        if: steps.information.outputs.procursus_bootstrapped != 'true'
+        run: ${{ github.workspace }}/build_tools/prepare_github_runner.sh
+
+      - name: Add Procursus to PATH
+        run: |
+          echo "/opt/procursus/bin" >> $GITHUB_PATH
+          echo "/opt/procursus/sbin" >> $GITHUB_PATH
+          echo "/opt/procursus/games" >> $GITHUB_PATH
+
+          echo "CPATH=$CPATH:/opt/procursus/include" >> $GITHUB_ENV
+
+          echo "LIBRARY_PATH=$LIBRARY_PATH:/opt/procursus/lib" >> $GITHUB_ENV
+
+      - name: Use Procursus make
+        run: sudo ln -s /opt/procursus/bin/gmake /opt/procursus/bin/make
+
+      - name: Update/Install build tools
+        run: |
+          sudo apt update
+          sudo apt install -y autoconf automake autopoint bash bison cmake \
+            docbook-xml docbook-xsl fakeroot findutils flex gawk git gnupg \
+            groff gzip ldid libtool make meson ncurses-bin openssl patch pkg-config \
+            po4a python3 sed tar triehash wget xz-utils zstd
+
+      - name: Create the new Procursus cache
+        run: |
+          sudo mkdir -p ${{ env.CACHE_PATH }}
+          sudo rsync -alHh --inplace /opt/procursus ${{ env.CACHE_PATH }}
+          sudo rm -rf ${{ env.CACHE_PATH }}/procursus/var/cache/apt/archives/partial \
+            ${{ env.CACHE_PATH }}/procursus/var/lib/apt/lists/partial \
+            ${{ env.CACHE_PATH }}/procursus/Library/dpkg/triggers/Lock \
+            ${{ env.CACHE_PATH }}/procursus/var/lib/apt/lists/lock \
+            ${{ env.CACHE_PATH }}/procursus/var/log/apt/term.log \
+            ${{ env.CACHE_PATH }}/procursus/var/cache/apt/archives/lock \
+            ${{ env.CACHE_PATH }}/procursus/Library/dpkg/lock \
+            ${{ env.CACHE_PATH }}/procursus/Library/dpkg/lock-frontend
+
+
+      - name: Save Procursus cache
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.CACHE_PATH }}
+          key: procursus
+
+      - name: Select Xcode version
+        run: |
           sudo xcode-select -s "${{ env.XCODE_ROOT }}"
           echo "==> Build environment"
           xcode-select -p
           xcrun --show-sdk-version
-      - run: echo "An updated Procursus build environment has been installed"
+          echo "PATH = $PATH"
+          echo "An updated Procursus build environment has been installed"
 
-      - name: Checkout Procursus repo
-        uses: actions/checkout@v4
-      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
+      - name: Restore build cache
+        uses: actions/cache@v3
+        id: build-cache
+        with:
+          path: ${{ env.BUILD_CACHE_PATH }}
+          key: procursus-build
 
       - name: Configure Mixxx
-        run: make mixxx
+        run: cd ${{ github.workspace }}; make mixxx NO_PGP=1
+
+      - name: Create build_work archive
+        if: always()
+        run: zip -r ${{ github.workspace }}/build_work.zip ${{ github.workspace }}/build_work/iphoneos-arm64/1700/
+
+      - name: Upload build_work archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_work
+          path: ${{ github.workspace }}/build_work.zip
+
+      - name: Create the new build cache
+        if: always()
+        run: |
+          rsync -avlhH \
+            --prune-empty-dirs \
+            --include='build_base/iphoneos-arm64/1700/**' \
+            --include='build_work/iphoneos-arm64/1700/**/.build_complete' \
+            --exclude='*' \
+            ${{ github.workspace }}/ \
+            ${{ env.BUILD_CACHE_PATH }}
+
+      - name: Save build cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.BUILD_CACHE_PATH }}
+          key: procursus-build
