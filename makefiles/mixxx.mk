@@ -15,8 +15,12 @@ mixxx-download-prebuilt-deps: setup
 	@echo "Dependencies to download: $(MIXXX_DEPS_TO_DOWNLOAD)"
 	@echo "List of packages to download:"
 	@echo "$(MIXXX_ALL_DEPS_TO_DOWNLOAD)"
-	@for dep in $(MIXXX_ALL_DEPS_TO_DOWNLOAD); do \
-  		$(BUILD_TOOLS)/try_download_package.sh $$dep; \
+	@export BUILD_BASE="$(BUILD_BASE)" BUILD_DIST="$(BUILD_DIST)" \
+		BUILD_WORK="$(BUILD_WORK)" DEB_ARCH="$(DEB_ARCH)" \
+		MACOSX_SUITE_NAME="$(MACOSX_SUITE_NAME)" MAKE="$(MAKE)" \
+		MEMO_CFVER="$(MEMO_CFVER)" MEMO_TARGET="$(MEMO_TARGET)"; \
+		for dep in $(MIXXX_ALL_DEPS_TO_DOWNLOAD); do \
+  			$(BUILD_TOOLS)/try_download_package.sh $$dep; \
   		done
 
 mixxx-setup: setup
