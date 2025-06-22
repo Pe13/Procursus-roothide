@@ -38,12 +38,13 @@ jobs:
           sudo rsync -aWlHh --inplace ${{ env.CACHE_PATH }}/procursus /opt
 
       - name: Check if cache was restored
+        id: check_cache_restored
         run: |
           echo \
             "procursus_bootstrapped=$(if [[ -e '/opt/procursus/bin/make' ]]; then echo 'true'; else echo 'false'; fi)" >> $GITHUB_OUTPUT
 
       - name: Prepare Procursus tools
-        if: steps.information.outputs.procursus_bootstrapped != 'true'
+        if: steps.check_cache_restored.outputs.procursus_bootstrapped != 'true'
         run: ${{ github.workspace }}/build_tools/prepare_github_runner.sh
 
       - name: Add Procursus to PATH
@@ -57,7 +58,7 @@ jobs:
           echo "LIBRARY_PATH=$LIBRARY_PATH:/opt/procursus/lib" >> $GITHUB_ENV
 
       - name: Use Procursus make
-        if: steps.information.outputs.procursus_bootstrapped != 'true'
+        if: steps.check_cache_restored.outputs.procursus_bootstrapped != 'true'
         run: sudo ln -s /opt/procursus/bin/gmake /opt/procursus/bin/make
 
       - name: Update/Install build tools
