@@ -57,6 +57,7 @@ jobs:
           echo "LIBRARY_PATH=$LIBRARY_PATH:/opt/procursus/lib" >> $GITHUB_ENV
 
       - name: Use Procursus make
+        if: steps.information.outputs.procursus_bootstrapped != 'true'
         run: sudo ln -s /opt/procursus/bin/gmake /opt/procursus/bin/make
 
       - name: Update/Install build tools
