@@ -11,11 +11,6 @@ MIXXX_DEPS_TO_BUILD += qt
 MIXXX_DEPS_TO_DOWNLOAD = $(filter-out $(MIXXX_DEPS_TO_BUILD), $(MIXXX_DEPS))
 MIXXX_ALL_DEPS_TO_DOWNLOAD = $(shell $(BUILD_TOOLS)/calc_packages_deps.py $(MIXXX_DEPS_TO_DOWNLOAD))
 
-mixxx-setup: setup
-	$(call GIT_CLONE,https://github.com/Pe13/mixxx.git,ios,mixxx)
-	#$(call DO_PATCH,mixxx,mixxx,-p1)
-	mkdir -p $(BUILD_WORK)/mixxx/build
-
 mixxx-download-prebuilt-deps: setup
 	@echo "Dependencies to download: $(MIXXX_DEPS_TO_DOWNLOAD)"
 	@echo "List of packages to download:"
@@ -24,11 +19,16 @@ mixxx-download-prebuilt-deps: setup
   		$(BUILD_TOOLS)/try_download_package.sh $$dep; \
   		done
 
+mixxx-setup: setup mixxx-download-prebuilt-deps
+	$(call GIT_CLONE,https://github.com/Pe13/mixxx.git,ios,mixxx)
+	#$(call DO_PATCH,mixxx,mixxx,-p1)
+	mkdir -p $(BUILD_WORK)/mixxx/build
+
 ifneq ($(wildcard $(BUILD_WORK)/mixxx/.build_complete),)
 mixxx:
 	@echo "Using previously built mixxx."
 else
-mixxx: mixxx-setup mixxx-download-prebuilt-deps $(MIXXX_DEPS)
+mixxx: mixxx-setup $(MIXXX_DEPS)
 	cd $(BUILD_WORK)/mixxx/build && cmake . \
 		-G"Xcode" \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
