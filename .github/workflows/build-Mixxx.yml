@@ -89,11 +89,12 @@ jobs:
           path: ${{ env.CACHE_PATH }}
           key: procursus
 
-      - name: Select Xcode version
+      - name: Select Xcode version and download aarch64-apple-ios rust toolchain
         run: |
           echo "==> Build environment"
           xcode-select -p
           xcrun --show-sdk-version
+          rustup target add aarch64-apple-ios
           echo "PATH = $PATH"
           echo "An updated Procursus build environment has been installed"
 
