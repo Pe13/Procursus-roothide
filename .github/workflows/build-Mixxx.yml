@@ -40,7 +40,7 @@ jobs:
       - name: Check if cache was restored
         run: |
           echo \
-            "procursus_bootstrapped=$(if [[ -e '/opt/procursus/.procursus_strapped' ]]; then echo 'true'; else echo 'false'; fi)" >> $GITHUB_OUTPUT
+            "procursus_bootstrapped=$(if [[ -e '/opt/procursus/bin/make' ]]; then echo 'true'; else echo 'false'; fi)" >> $GITHUB_OUTPUT
 
       - name: Prepare Procursus tools
         if: steps.information.outputs.procursus_bootstrapped != 'true'
