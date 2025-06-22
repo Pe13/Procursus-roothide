@@ -30,6 +30,7 @@ if [ ! -e ${BUILD_WORK}/${1}/.build_complete ]; then
 			fi
 		fi
 		dpkg -x ${BUILD_DIST}/${pkg} ${BUILD_BASE}
+		echo "${pkg} successfully downloaded."
 	done
 
 	mkdir -p ${BUILD_WORK}/${1}
