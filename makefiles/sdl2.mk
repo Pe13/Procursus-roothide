@@ -3,7 +3,7 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS   += sdl2
-SDL2_VERSION  := 2.0.14
+SDL2_VERSION  := 2.24.0
 DEB_SDL2_V    ?= $(SDL2_VERSION)
 
 ### Do X11 stuff with this later
@@ -12,8 +12,9 @@ ifneq (,$(findstring darwin,$(MEMO_TARGET)))
 SDL2_CONFIGURE_FLAGS :=
 else
 SDL2_CONFIGURE_FLAGS := --host=aarch64-ios-darwin \
-						CFLAGS="-DNDEBUG -DIOS_DYLIB -fPIC -fobjc-arc $(CFLAGS)" \
-						CPPFLAGS="-DNDEBUG -DIOS_DYLIB -fPIC -fobjc-arc $(CPPFLAGS)"
+						CFLAGS="-DNDEBUG -DIOS_DYLIB -fPIC -fobjc-arc -std=c99 $(CFLAGS)" \
+						CPPFLAGS="-DNDEBUG -DIOS_DYLIB -fPIC -fobjc-arc -Wno-declaration-after-statement $(CPPFLAGS)" \
+						CXXFLAGS=" $(CXXFLAGS) -std=c++11 "
 endif
 
 sdl2-setup: setup
@@ -21,7 +22,9 @@ sdl2-setup: setup
 	$(call EXTRACT_TAR,SDL2-$(SDL2_VERSION).tar.gz,SDL2-$(SDL2_VERSION),sdl2)
 ifeq (,$(findstring darwin,$(MEMO_TARGET)))
 	sed -i -e 's/have_metal=no/have_metal=yes/' -e '/\ CheckMETAL/a CheckHIDAPI' \
-		-e '/framework,UIKit/a EXTRA_LDFLAGS="\$$EXTRA_LDFLAGS -Wl,-framework,IOKit -Wl,-framework,CoreHaptics"' $(BUILD_WORK)/sdl2/configure
+		-e '/framework,UIKit/a EXTRA_LDFLAGS="\$$EXTRA_LDFLAGS -Wl,-framework,IOKit -Wl,-framework,CoreHaptics"' \
+		-e 's/-Werror=declaration-after-statement//' \
+		$(BUILD_WORK)/sdl2/configure
 	sed -i 's/#elif __MACOSX__/#elif __APPLE__/' $(BUILD_WORK)/sdl2/src/hidapi/SDL_hidapi.c
 endif
 

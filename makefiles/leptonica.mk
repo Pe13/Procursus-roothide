@@ -3,11 +3,11 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS       += leptonica
-LEPTONICA_VERSION := 1.80.0
+LEPTONICA_VERSION := 1.86.0
 DEB_LEPTONICA_V   ?= $(LEPTONICA_VERSION)
 
 leptonica-setup: setup
-	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),http://www.leptonica.org/source/leptonica-$(LEPTONICA_VERSION).tar.gz)
+	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://github.com/DanBloomberg/leptonica/releases/download/$(LEPTONICA_VERSION)/leptonica-$(LEPTONICA_VERSION).tar.gz)
 	$(call EXTRACT_TAR,leptonica-$(LEPTONICA_VERSION).tar.gz,leptonica-$(LEPTONICA_VERSION),leptonica)
 
 ifneq ($(wildcard $(BUILD_WORK)/leptonica/.build_complete),)

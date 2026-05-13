@@ -17,15 +17,21 @@ pcre2:
 	@echo "Using previously built pcre2."
 else
 pcre2: pcre2-setup readline
-	cd $(BUILD_WORK)/pcre2 && ./configure -C \
-		$(DEFAULT_CONFIGURE_FLAGS) \
-		--enable-jit \
-		--enable-pcre2-16 \
-		--enable-pcre2-32 \
-		--enable-pcre2grep-libz \
-		--enable-pcre2grep-libbz2 \
-	+$(MAKE) -C $(BUILD_WORK)/pcre2
-	+$(MAKE) -C $(BUILD_WORK)/pcre2 install \
+	#cd $(BUILD_WORK)/pcre2 && ./configure -C \
+	#		$(DEFAULT_CONFIGURE_FLAGS) \
+	#		--enable-jit \
+	#		--enable-pcre2-16 \
+	#		--enable-pcre2-32 \
+	#		--enable-pcre2grep-libz \
+	#		--enable-pcre2grep-libbz2
+	cmake -S $(BUILD_WORK)/pcre2 -B $(BUILD_WORK)/pcre2/build \
+		$(DEFAULT_CMAKE_FLAGS) \
+		-DPCRE2_BUILD_PCRE2_16=ON \
+		-DPCRE2_BUILD_PCRE2_32=ON \
+		-DPCRE2_SUPPORT_JIT=OFF \
+		-DPCRE2_BUILD_TESTS=OFF
+	+$(MAKE) -C $(BUILD_WORK)/pcre2/build
+	+$(MAKE) -C $(BUILD_WORK)/pcre2/build install \
 		DESTDIR=$(BUILD_STAGE)/pcre2
 	$(call AFTER_BUILD,copy)
 endif

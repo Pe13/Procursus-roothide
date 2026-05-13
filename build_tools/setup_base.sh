@@ -26,9 +26,12 @@ if [ ! -e ${BUILD_WORK}/${1}/.build_complete ]; then
 			fi
 		else
 			if ! wget -q -P ${BUILD_DIST} https://apt.procurs.us/pool/main/"${MEMO_TARGET}"/"${MEMO_CFVER}"/${pkg}; then
-				echo "${pkg} is not available, building from source."
-				${MAKE} ${1}
-				exit 0;
+			  if ! wget -q -P ${BUILD_DIST} https://apt.procurs.us/pool/main/"${MEMO_TARGET}"/"${MEMO_CFVER}"/"${1}"/${pkg}; then
+          echo "${pkg} is not available at https://apt.procurs.us/pool/main/"${MEMO_TARGET}"/"${MEMO_CFVER}"/${pkg}"
+          echo "nor https://apt.procurs.us/pool/main/"${MEMO_TARGET}"/"${MEMO_CFVER}"/"${1}"/${pkg}, building from source."
+          ${MAKE} ${1}
+          exit 0;
+        fi
 			fi
 		fi
 		dpkg -x ${BUILD_DIST}/${pkg} ${BUILD_BASE}

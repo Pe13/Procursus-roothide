@@ -23,11 +23,9 @@ else
 x264: x264-setup
 	cd $(BUILD_WORK)/x264 && ./configure \
 		$(DEFAULT_CONFIGURE_FLAGS) \
-		--enable-shared \
 		--enable-static \
 		--enable-strip \
-		--system-libx264 \
-		--enable-lto \
+		--extra-ldflags='-framework CoreFoundation -framework CoreMedia -framework CoreVideo' \
 		$(X264_CONFIGURE_ARGS)
 	+$(MAKE) -C $(BUILD_WORK)/x264
 	+$(MAKE) -C $(BUILD_WORK)/x264 install \

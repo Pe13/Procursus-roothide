@@ -34,8 +34,10 @@ libopus-package: libopus-stage
 	cp -a $(BUILD_STAGE)/libopus/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/libopus.0.dylib $(BUILD_DIST)/libopus0/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
 
 	# libopus.mk Prep libopus-dev
-	cp -a $(BUILD_STAGE)/libopus/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/libopus.{a,dylib} $(BUILD_DIST)/libopus-dev/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
+	cp -a $(BUILD_STAGE)/libopus/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/libopus.{a,dylib,la} $(BUILD_DIST)/libopus-dev/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
+	cp -a $(BUILD_STAGE)/libopus/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/pkgconfig $(BUILD_DIST)/libopus-dev/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
 	cp -a $(BUILD_STAGE)/libopus/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include $(BUILD_DIST)/libopus-dev/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)
+	cp -a $(BUILD_STAGE)/libopus/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/share $(BUILD_DIST)/libopus-dev/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)
 
 	# libopus.mk Sign
 	$(call SIGN,libopus0,general.xml)

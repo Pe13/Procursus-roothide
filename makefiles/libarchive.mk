@@ -9,7 +9,7 @@ DEB_LIBARCHIVE_V   ?= $(LIBARCHIVE_VERSION)
 libarchive-setup: setup
 	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://www.libarchive.org/downloads/libarchive-$(LIBARCHIVE_VERSION).tar.xz)
 	$(call EXTRACT_TAR,libarchive-$(LIBARCHIVE_VERSION).tar.xz,libarchive-$(LIBARCHIVE_VERSION),libarchive)
-	sed -i 's|LIBS="-llzma|LIBS="-Wl,-needed_library,$(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)$(MEMO_ALT_PREFIX)/lib/liblzma.dylib|' $(BUILD_WORK)/libarchive/configure
+	sed -i 's|LIBS="-llzma|LIBS="-Wl,-needed_library,$(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/liblzma.a|' $(BUILD_WORK)/libarchive/configure
 
 ifneq ($(wildcard $(BUILD_WORK)/libarchive/.build_complete),)
 libarchive:
@@ -22,9 +22,9 @@ libarchive: libarchive-setup lz4 liblzo2 zstd xz nettle
 		--without-openssl \
 		--with-nettle \
 		--with-lzo2 \
-		--enable-bsdtar=shared \
-		--enable-bsdcpio=shared \
-		--enable-bsdcat=shared
+		--enable-bsdtar=static \
+		--enable-bsdcpio=static \
+		--enable-bsdcat=static
 	+$(MAKE) -C $(BUILD_WORK)/libarchive
 	+$(MAKE) -C $(BUILD_WORK)/libarchive install \
 		DESTDIR="$(BUILD_STAGE)/libarchive"

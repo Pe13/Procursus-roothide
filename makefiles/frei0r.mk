@@ -6,21 +6,24 @@ SUBPROJECTS    += frei0r
 FREI0R_VERSION := 1.8.0
 DEB_FREI0R_V   ?= $(FREI0R_VERSION)
 
+LIB_PREFIX = $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
+
 frei0r-setup: setup
-	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://files.dyne.org/frei0r/releases/frei0r-plugins-$(FREI0R_VERSION).tar.gz)
+	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://files.dyne.org/frei0r/old-releases/frei0r-plugins-$(FREI0R_VERSION).tar.gz)
 	$(call EXTRACT_TAR,frei0r-plugins-$(FREI0R_VERSION).tar.gz,frei0r-plugins-$(FREI0R_VERSION),frei0r)
+	$(call DO_PATCH,frei0r,frei0r,-p1)
 
 ifneq ($(wildcard $(BUILD_WORK)/frei0r/.build_complete),)
 frei0r:
 	@echo "Using previously built frei0r."
 else
 frei0r: frei0r-setup cairo
-	cd $(BUILD_WORK)/frei0r && cmake . \
+	cmake -S $(BUILD_WORK)/frei0r -B $(BUILD_WORK)/frei0r/build \
 		$(DEFAULT_CMAKE_FLAGS) \
 		-DWITHOUT_OPENCV=ON \
 		-DWITHOUT_GAVL=ON
-	+$(MAKE) -C $(BUILD_WORK)/frei0r
-	+$(MAKE) -C $(BUILD_WORK)/frei0r install \
+	+$(MAKE) -C $(BUILD_WORK)/frei0r/build
+	+$(MAKE) -C $(BUILD_WORK)/frei0r/build install \
 		DESTDIR=$(BUILD_STAGE)/frei0r
 	for file in $(BUILD_STAGE)/frei0r/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/frei0r-1/*.so ; do mv $$file "$${file%.*}.dylib" ; done
 	$(call AFTER_BUILD,copy)

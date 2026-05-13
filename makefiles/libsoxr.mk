@@ -20,7 +20,6 @@ libsoxr: libsoxr-setup
 		$(DEFAULT_CMAKE_FLAGS) \
 		-DBUILD_TESTS=0 \
 		-DBUILD_EXAMPLES=0 \
-		-DBUILD_SHARED_LIBS=1 \
 		-DWITH_LSR_BINDINGS=1 \
 		..
 	+$(MAKE) -C $(BUILD_WORK)/libsoxr/build

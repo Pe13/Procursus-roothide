@@ -1,7 +1,7 @@
-Package: libprotobuf32
+Package: libutf8-range31.1
 Version: @DEB_LIBPROTOBUF_V@
 Architecture: @DEB_ARCH@
 Maintainer: @DEB_MAINTAINER@
 Section: Libraries
 Priority: standard
-Description: Protocol Buffers - Google's data interchange format
+Description: protocol buffers utf library

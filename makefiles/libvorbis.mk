@@ -21,7 +21,6 @@ else
 libvorbis: libvorbis-setup libogg
 	cd $(BUILD_WORK)/libvorbis && ./configure -C \
 		$(DEFAULT_CONFIGURE_FLAGS) \
-		--disable-dependency-tracking \
 		--with-pic \
 		--disable-docs \
 		--disable-oggtest

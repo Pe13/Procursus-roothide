@@ -19,7 +19,6 @@ libsnappy: libsnappy-setup
 	cd $(BUILD_WORK)/libsnappy && cmake . \
 		$(DEFAULT_CMAKE_FLAGS) \
 		-DCOMMON_ARCH=$(DEB_ARCH) \
-		-DBUILD_SHARED_LIBS=true \
 		-DSNAPPY_BUILD_BENCHMARKS=false \
 		-DSNAPPY_BUILD_TESTS=false
 	+$(MAKE) -C $(BUILD_WORK)/libsnappy all

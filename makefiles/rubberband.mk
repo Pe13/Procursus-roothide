@@ -18,22 +18,28 @@ rubberband-setup: setup
 	system = 'darwin'\n \
 	[properties]\n \
 	root = '$(BUILD_BASE)'\n \
+	pkg_config_static = true\n \
 	[built-in options]\n \
 	prefix ='$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)'\n \
+	sysconfdir='$(MEMO_PREFIX)/etc'\n \
+	localstatedir='$(MEMO_PREFIX)/var'\n \
+	default_library='static'\n \
 	[binaries]\n \
 	c = '$(CC)'\n \
 	cpp = '$(CXX)'\n \
-	pkgconfig = '$(BUILD_TOOLS)/cross-pkg-config'\n" > $(BUILD_WORK)/rubberband/build/cross.txt
+	pkg-config = '$(BUILD_TOOLS)/static-cross-pkg-config'\n" > $(BUILD_WORK)/rubberband/build/cross.txt
 
 ifneq ($(wildcard $(BUILD_WORK)/rubberband/.build_complete),)
 rubberband:
 	@echo "Using previously built rubberband."
 else
-rubberband: rubberband-setup libsamplerate libsndfile
-	cd $(BUILD_WORK)/rubberband/build && meson \
+rubberband: rubberband-setup libsamplerate libsndfile lv2
+	cd $(BUILD_WORK)/rubberband/build && meson setup \
 		--cross-file cross.txt \
+		-Dresampler=libsamplerate \
 		..
-	+DESTDIR=$(BUILD_STAGE)/rubberband ninja -C $(BUILD_WORK)/rubberband/build install
+	+ninja -C $(BUILD_WORK)/rubberband/build
+	+DESTDIR="$(BUILD_STAGE)/rubberband" ninja -C $(BUILD_WORK)/rubberband/build install
 	$(call AFTER_BUILD,copy)
 endif
 

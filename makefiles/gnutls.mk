@@ -9,6 +9,7 @@ DEB_GNUTLS_V   ?= $(GNUTLS_VERSION)
 gnutls-setup: setup
 	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://www.gnupg.org/ftp/gcrypt/gnutls/v$(shell echo $(GNUTLS_VERSION) | cut -d. -f-2)/gnutls-$(GNUTLS_VERSION).tar.xz)
 	$(call EXTRACT_TAR,gnutls-$(GNUTLS_VERSION).tar.xz,gnutls-$(GNUTLS_VERSION),gnutls)
+	$(call DO_PATCH,gnutls,gnutls,-p1)
 	sed -i 's/-keep_private_externs -nostdlib/-keep_private_externs $(PLATFORM_VERSION_MIN) -arch $(MEMO_ARCH) -nostdlib/g' $(BUILD_WORK)/gnutls/configure
 
 ifneq ($(wildcard $(BUILD_WORK)/gnutls/.build_complete),)
@@ -20,11 +21,12 @@ gnutls: gnutls-setup readline gettext libgcrypt libgmp10 libidn2 libunistring ne
 	cd $(BUILD_WORK)/gnutls && ./configure -C \
 		$(DEFAULT_CONFIGURE_FLAGS) \
 		--disable-guile \
+		--disable-tests \
 		--enable-local-libopts \
 		--with-default-trust-store-file=$(MEMO_PREFIX)/etc/ssl/certs/cacert.pem \
 		ac_cv_func_malloc_0_nonnull=yes \
 		ac_cv_func_realloc_0_nonnull=yes \
-		P11_KIT_CFLAGS=-I$(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/p11-kit-1
+		--without-p11-kit
 	+$(MAKE) -C $(BUILD_WORK)/gnutls
 	+$(MAKE) -C $(BUILD_WORK)/gnutls install \
 		DESTDIR=$(BUILD_STAGE)/gnutls

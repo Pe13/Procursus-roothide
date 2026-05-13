@@ -16,9 +16,9 @@ else
 aom: aom-setup
 	cd $(BUILD_WORK)/aom/build && cmake . \
 		$(DEFAULT_CMAKE_FLAGS) \
-		-DBUILD_SHARED_LIBS=1 \
 		-DCONFIG_RUNTIME_CPU_DETECT=0 \
 		-DENABLE_TESTS=0 \
+		-DENABLE_EXAMPLES=OFF \
 		-DENABLE_DOCS=0 \
 		-DGIT_EXECUTABLE=/non-existant-binary \
 		-DAOM_TARGET_CPU="$(MEMO_ARCH)" \

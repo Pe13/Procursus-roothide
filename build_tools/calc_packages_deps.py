@@ -51,7 +51,7 @@ def parse_rules(make_db_text):
 
 def compute_closure(rules, start):
     seen = set()
-    order = []
+    order = [start]
     stack = deque([start])
     while stack:
         node = stack.pop()
@@ -86,18 +86,6 @@ def main():
 
     make_db = dump_make_database(args.makefile)
     rules = parse_rules(make_db)
-
-    # for tgt in args.targets:
-    #     closure = compute_closure(rules, tgt)
-    #     if args.verbose:
-    #         print(f"Dependencies for target '{tgt}':")
-    #     if closure:
-    #         indent = "  " if args.verbose else ""
-    #         for dep in closure:
-    #             print(indent + f"{dep}")
-    #     elif args.verbose:
-    #         print("  (none or target undefined)")
-    #         print()
 
     if args.verbose:
         for tgt in args.targets:

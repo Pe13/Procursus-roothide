@@ -3,7 +3,7 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS     += libwebp
-LIBWEBP_VERSION := 1.2.2
+LIBWEBP_VERSION := 1.6.0
 DEB_LIBWEBP_V   ?= $(LIBWEBP_VERSION)
 
 libwebp-setup: setup
@@ -11,19 +11,19 @@ libwebp-setup: setup
 		https://chromium.googlesource.com/webm/libwebp/+archive/refs/heads/$(LIBWEBP_VERSION).tar.gz)
 	# Fuck this lib.
 	mkdir -p $(BUILD_WORK)/libwebp
-	tar xf $(BUILD_SOURCE)/libwebp-$(LIBWEBP_VERSION).tar.gz -C $(BUILD_WORK)/libwebp
+	@[ $$(ls -A "$(BUILD_WORK)/libwebp" | wc -l) -ne 0 ] && \
+		echo "Already extracted" || \
+		tar xf $(BUILD_SOURCE)/libwebp-$(LIBWEBP_VERSION).tar.gz -C $(BUILD_WORK)/libwebp
 
 ifneq ($(wildcard $(BUILD_WORK)/libwebp/.build_complete),)
 libwebp:
 	@echo "Using previously built libwebp."
 else
 libwebp: libwebp-setup libpng16 libgif libtiff libjpeg-turbo
-	cd $(BUILD_WORK)/libwebp && ./autogen.sh && ./configure \
-		$(DEFAULT_CONFIGURE_FLAGS) \
-		--disable-{sdl,gl} \
-		--enable-libwebp{mux,demux,decoder,extras}
-	+$(MAKE) -C $(BUILD_WORK)/libwebp
-	+$(MAKE) -C $(BUILD_WORK)/libwebp install \
+	cmake -S $(BUILD_WORK)/libwebp -B $(BUILD_WORK)/libwebp/build \
+    		$(DEFAULT_CMAKE_FLAGS)
+	+$(MAKE) -C $(BUILD_WORK)/libwebp/build
+	+$(MAKE) -C $(BUILD_WORK)/libwebp/build install \
 		DESTDIR="$(BUILD_STAGE)/libwebp"
 	$(call AFTER_BUILD,copy)
 endif

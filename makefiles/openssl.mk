@@ -50,7 +50,7 @@ ifeq ($(shell [ "$(CFVER_WHOLE)" -lt 1400 ] && echo 1),1)
 	cd $(BUILD_WORK)/openssl && ./Configure \
 		--prefix=$(MEMO_PREFIX)$(MEMO_SUB_PREFIX) \
 		--openssldir=$(MEMO_PREFIX)/etc/ssl \
-		shared \
+		no-shared \
 		no-tests \
 		-DOPENSSL_NO_APPLE_CRYPTO_RANDOM \
 		darwin64-$$(echo $(LLVM_TARGET) | cut -f1 -d-)
@@ -58,7 +58,7 @@ else
 	cd $(BUILD_WORK)/openssl && ./Configure \
 		--prefix=$(MEMO_PREFIX)$(MEMO_SUB_PREFIX) \
 		--openssldir=$(MEMO_PREFIX)/etc/ssl \
-		shared \
+		no-shared \
 		no-tests \
 		darwin64-$$(echo $(LLVM_TARGET) | cut -f1 -d-)
 endif

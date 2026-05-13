@@ -3,7 +3,7 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS      += openjpeg
-OPENJPEG_VERSION := 2.5.0
+OPENJPEG_VERSION := 2.5.4
 DEB_OPENJPEG_V   ?= $(OPENJPEG_VERSION)
 
 openjpeg-setup: setup
@@ -15,11 +15,11 @@ openjpeg:
 	@echo "Using previously built openjpeg."
 else
 openjpeg: openjpeg-setup libpng16 libtiff lcms2
-	cd $(BUILD_WORK)/openjpeg && cmake . \
+	cmake -S $(BUILD_WORK)/openjpeg -B $(BUILD_WORK)/openjpeg/build \
 		$(DEFAULT_CMAKE_FLAGS) \
 		-DCOMMON_ARCH=$(DEB_ARCH)
-	+$(MAKE) -C $(BUILD_WORK)/openjpeg
-	+$(MAKE) -C $(BUILD_WORK)/openjpeg install \
+	+$(MAKE) -C $(BUILD_WORK)/openjpeg/build
+	+$(MAKE) -C $(BUILD_WORK)/openjpeg/build install \
 		DESTDIR="$(BUILD_STAGE)/openjpeg"
 	$(call AFTER_BUILD,copy)
 endif

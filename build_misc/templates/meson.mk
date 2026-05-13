@@ -22,6 +22,7 @@ DEB_@PKG@_V   ?= $(@PKG@_VERSION)
 	prefix ='$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)'\n \
 	sysconfdir='$(MEMO_PREFIX)/etc'\n \
 	localstatedir='$(MEMO_PREFIX)/var'\n \
+	default_library='static'\n \
 	[binaries]\n \
 	c = '$(CC)'\n \
 	cpp = '$(CXX)'\n \
@@ -32,12 +33,11 @@ ifneq ($(wildcard $(BUILD_WORK)/@pkg@/.build_complete),)
 	@echo "Using previously built @pkg@."
 else
 @pkg@: @pkg@-setup
-	cd $(BUILD_WORK)/@pkg@/build && meson \
+	cd $(BUILD_WORK)/@pkg@/build && meson setup \
 		--cross-file cross.txt \
 		..
 	+ninja -C $(BUILD_WORK)/@pkg@/build
-	+ninja -C $(BUILD_WORK)/@pkg@/build install \
-		DESTDIR="$(BUILD_STAGE)/@pkg@"
+	+DESTDIR="$(BUILD_STAGE)/@pkg@" ninja -C $(BUILD_WORK)/@pkg@/build install
 	$(call AFTER_BUILD)
 endif
 

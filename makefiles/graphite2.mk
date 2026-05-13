@@ -9,17 +9,17 @@ DEB_GRAPHITE2_V   ?= $(GRAPHITE2_VERSION)
 graphite2-setup: setup
 	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://github.com/silnrsi/graphite/releases/download/$(GRAPHITE2_VERSION)/graphite2-$(GRAPHITE2_VERSION).tgz)
 	$(call EXTRACT_TAR,graphite2-$(GRAPHITE2_VERSION).tgz,graphite2-$(GRAPHITE2_VERSION),graphite2)
+	$(call DO_PATCH,graphite2,graphite2,-p1)
 
 ifneq ($(wildcard $(BUILD_WORK)/graphite2/.build_complete),)
 graphite2:
 	@echo "Using previously built graphite2."
 else
 graphite2: graphite2-setup
-	cd $(BUILD_WORK)/graphite2 && cmake . \
-		$(DEFAULT_CMAKE_FLAGS) \
-		.
-	+$(MAKE) -C $(BUILD_WORK)/graphite2
-	+$(MAKE) -C $(BUILD_WORK)/graphite2 install \
+	cmake -S $(BUILD_WORK)/graphite2 -B $(BUILD_WORK)/graphite2/build \
+		$(DEFAULT_CMAKE_FLAGS)
+	+$(MAKE) -C $(BUILD_WORK)/graphite2/build
+	+$(MAKE) -C $(BUILD_WORK)/graphite2/build install \
 		DESTDIR=$(BUILD_STAGE)/graphite2
 	$(call AFTER_BUILD,copy)
 endif

@@ -29,8 +29,8 @@ libvpx: libvpx-setup
 	cd $(BUILD_WORK)/libvpx && ./configure \
 		--prefix=$(MEMO_PREFIX)$(MEMO_SUB_PREFIX) \
 		--disable-dependency-tracking \
-		--enable-shared \
 		--disable-unit-tests \
+		--disable-examples \
 		--enable-pic \
 		--enable-postproc \
 		--enable-multi-res-encoding \
@@ -42,11 +42,6 @@ libvpx: libvpx-setup
 	+$(MAKE) -C $(BUILD_WORK)/libvpx
 	+$(MAKE) -C $(BUILD_WORK)/libvpx install \
 		DESTDIR=$(BUILD_STAGE)/libvpx
-
-	for bin in $(BUILD_STAGE)/libvpx/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/bin/*; do \
-		$(I_N_T) -change libvpx.7.dylib /$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/libvpx.7.dylib $$bin; \
-	done
-	$(I_N_T) -id $(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/libvpx.7.dylib $(BUILD_STAGE)/libvpx/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/libvpx.7.dylib
 	$(call AFTER_BUILD,copy)
 endif
 

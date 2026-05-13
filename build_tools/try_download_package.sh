@@ -25,8 +25,10 @@ if [ ! -e ${BUILD_WORK}/${1}/.build_complete ]; then
 			fi
 		else
 			if ! wget -q -P ${BUILD_DIST} https://apt.procurs.us/pool/main/"${MEMO_TARGET}"/"${MEMO_CFVER}"/${pkg}; then
-				echo "${pkg} is not available, it will be built from source."
-				exit 0;
+        if ! wget -q -P ${BUILD_DIST} https://apt.procurs.us/pool/main/"${MEMO_TARGET}"/"${MEMO_CFVER}"/${1}/${pkg}; then
+          echo "${pkg} is not available, it will be built from source."
+          exit 0;
+        fi
 			fi
 		fi
 		dpkg -x ${BUILD_DIST}/${pkg} ${BUILD_BASE}
@@ -34,6 +36,7 @@ if [ ! -e ${BUILD_WORK}/${1}/.build_complete ]; then
 	done
 
 	mkdir -p ${BUILD_WORK}/${1}
+	echo "touching ${BUILD_WORK}/${1}/.build_complete"
 	touch ${BUILD_WORK}/${1}/.build_complete
 else
 	echo "${1} is already in build_base."

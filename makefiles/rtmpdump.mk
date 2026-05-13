@@ -3,31 +3,31 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS       += rtmpdump
-RTMPDUMP_VERSION  := 2.4
+RTMPDUMP_VERSION  := 2.6
 RTMPDUMP_SHORT_V1 := 20151223
 RTMPDUMP_SHORT_V2 := gitfa8646d.1
 DEB_RTMPDUMP_V    ?= $(RTMPDUMP_VERSION)+$(RTMPDUMP_SHORT_V1).$(RTMPDUMP_SHORT_V2)-1
 
 rtmpdump-setup: setup
-	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),http://deb.debian.org/debian/pool/main/r/rtmpdump/rtmpdump_$(RTMPDUMP_VERSION)+$(RTMPDUMP_SHORT_V1).$(RTMPDUMP_SHORT_V2).orig.tar.gz)
-	$(call EXTRACT_TAR,rtmpdump_$(RTMPDUMP_VERSION)+$(RTMPDUMP_SHORT_V1).$(RTMPDUMP_SHORT_V2).orig.tar.gz,rtmpdump-$(RTMPDUMP_SHORT_V1),rtmpdump)
+	$(call GIT_CLONE,https://git.ffmpeg.org/rtmpdump.git,v$(RTMPDUMP_VERSION),rtmpdump)
 
 ifneq ($(wildcard $(BUILD_WORK)/rtmpdump/.build_complete),)
 rtmpdump:
 	@echo "Using previously built rtmpdump."
 else
-rtmpdump: rtmpdump-setup nettle gnutls libgmp10
+rtmpdump: rtmpdump-setup nettle libgmp10 openssl
 	mkdir -p $(BUILD_STAGE)/rtmpdump/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
-	+$(MAKE) -C $(BUILD_WORK)/rtmpdump install \
+	+$(MAKE) -C $(BUILD_WORK)/rtmpdump/librtmp install \
 		CC="$(CC)" \
 		LD="$(LD)" \
-		CRYPTO=GNUTLS \
+		CRYPTO=OPENSSL \
 		XCFLAGS="$(CFLAGS)" \
 		XLDFLAGS="$(LDFLAGS)" \
 		SYS=darwin \
 		prefix="/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)" \
 		DESTDIR="$(BUILD_STAGE)/rtmpdump" \
-		mandir="/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/share/man"
+		mandir="/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/share/man" \
+		SHARED=
 	$(call AFTER_BUILD,copy)
 endif
 

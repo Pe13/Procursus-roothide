@@ -19,8 +19,9 @@ else
 zstd: zstd-setup lz4 xz
 	sed -i s/'UNAME := $$(shell uname)'/'UNAME := Darwin'/ $(BUILD_WORK)/zstd/lib/libzstd.mk
 	sed -i 's/$$(shell uname)/Darwin/g' $(BUILD_WORK)/zstd/Makefile
+	sed -i 's/install-static install-shared/install-static/' $(BUILD_WORK)/zstd/lib/Makefile
 	+$(MAKE) -C $(BUILD_WORK)/zstd install \
-		LZMALD="$(BUILD_BASE)/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)$(MEMO_ALT_PREFIX)/lib/liblzma.dylib" \
+		LZMALD="$(BUILD_BASE)/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib/liblzma.a" \
 		PREFIX=$(MEMO_PREFIX)$(MEMO_SUB_PREFIX) \
 		DESTDIR=$(BUILD_STAGE)/zstd \
 		UNAME=Darwin

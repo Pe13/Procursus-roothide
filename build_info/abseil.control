@@ -1,0 +1,10 @@
+Package: abseil
+Version: @DEB_ABSEIL_V@
+Architecture: @DEB_ARCH@
+Maintainer: @DEB_MAINTAINER@
+Author: 
+Depends:
+Section: 
+Priority:
+Homepage:
+Description:

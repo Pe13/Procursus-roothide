@@ -3,7 +3,7 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS     += libtiff
-LIBTIFF_VERSION := 4.2.0
+LIBTIFF_VERSION := 4.7.1
 DEB_LIBTIFF_V   ?= $(LIBTIFF_VERSION)-1
 
 libtiff-setup: setup
@@ -19,12 +19,17 @@ else
 libtiff: libtiff-setup libjpeg-turbo xz zstd
 	cd $(BUILD_WORK)/libtiff && ./configure -C \
 		$(DEFAULT_CONFIGURE_FLAGS) \
-		--disable-webp \
-		--with-lzma-lib-dir=$(BUILD_BASE)/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)$(MEMO_ALT_PREFIX)/lib \
-		--with-lzma-include-dir=$(BUILD_BASE)/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)$(MEMO_ALT_PREFIX)/include
+		--disable-webp
 	+$(MAKE) -C $(BUILD_WORK)/libtiff
 	+$(MAKE) -C $(BUILD_WORK)/libtiff install \
 		DESTDIR="$(BUILD_STAGE)/libtiff"
+	#cmake -S $(BUILD_WORK)/libtiff -B $(BUILD_WORK)/libtiff/build \
+	#		$(DEFAULT_CMAKE_FLAGS) \
+	#		-Dwebp=OFF \
+	#		-Dtiff-tests=OFF
+	#	+$(MAKE) -C $(BUILD_WORK)/libtiff/build
+	#	+$(MAKE) -C $(BUILD_WORK)/libtiff/build install \
+	#		DESTDIR="$(BUILD_STAGE)/libtiff"
 	$(call AFTER_BUILD,copy)
 endif
 

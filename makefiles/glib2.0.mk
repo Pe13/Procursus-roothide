@@ -24,18 +24,19 @@ glib2.0-setup: setup
 	prefix ='$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)'\n \
 	sysconfdir='$(MEMO_PREFIX)/etc'\n \
 	localstatedir='$(MEMO_PREFIX)/var'\n \
+	default_library='static'\n \
 	[binaries]\n \
 	c = '$(CC)'\n \
 	objc = '$(CC)'\n \
 	cpp = '$(CXX)'\n \
-	pkgconfig = '$(BUILD_TOOLS)/cross-pkg-config'\n" > $(BUILD_WORK)/glib2.0/build/cross.txt
+	pkg-config = '$(BUILD_TOOLS)/cross-pkg-config'\n" > $(BUILD_WORK)/glib2.0/build/cross.txt
 
 ifneq ($(wildcard $(BUILD_WORK)/glib2.0/.build_complete),)
 glib2.0:
 	@echo "Using previously built glib2.0."
 else
 glib2.0: glib2.0-setup gettext pcre2 libffi
-	cd $(BUILD_WORK)/glib2.0/build && meson \
+	cd $(BUILD_WORK)/glib2.0/build && LDFLAGS="$(LDFLAGS) -framework CoreFoundation"  meson setup \
 		--cross-file cross.txt \
 		-Ddtrace=false \
 		-Dbsymbolic_functions=false \

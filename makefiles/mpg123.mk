@@ -3,7 +3,7 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS    += mpg123
-MPG123_VERSION := 1.26.3
+MPG123_VERSION := 1.33.4
 DEB_MPG123_V   ?= $(MPG123_VERSION)
 
 mpg123-setup: setup
@@ -15,13 +15,12 @@ mpg123:
 	@echo "Using previously built mpg123."
 else
 mpg123: mpg123-setup
-	cd $(BUILD_WORK)/mpg123 && ./configure \
-		$(DEFAULT_CONFIGURE_FLAGS) \
-		--with-audio=coreaudio \
-		--with-cpu=aarch64
-	+$(MAKE) -C $(BUILD_WORK)/mpg123 install \
-		DESTDIR=$(BUILD_STAGE)/mpg123
-	$(call AFTER_BUILD)
+	cmake -S $(BUILD_WORK)/mpg123/ports/cmake -B $(BUILD_WORK)/mpg123/build \
+		$(DEFAULT_CMAKE_FLAGS)
+	+$(MAKE) -C $(BUILD_WORK)/mpg123/build
+	+$(MAKE) -C $(BUILD_WORK)/mpg123/build install \
+		DESTDIR="$(BUILD_STAGE)/mpg123"
+	$(call AFTER_BUILD,copy)
 endif
 
 mpg123-package: mpg123-stage

@@ -22,7 +22,8 @@ ffmpeg: ffmpeg-setup aom dav1d fontconfig freetype frei0r gnutls lame libass lib
 	cd $(BUILD_WORK)/ffmpeg && ./configure \
 		--cross-prefix="$(GNU_HOST_TRIPLE)-" \
 		--prefix=$(MEMO_PREFIX)$(MEMO_SUB_PREFIX) \
-		--enable-shared \
+		--disable-shared \
+		--enable-static \
 		--enable-pthreads \
 		--enable-version3 \
 		--enable-cross-compile \
@@ -38,7 +39,6 @@ ffmpeg: ffmpeg-setup aom dav1d fontconfig freetype frei0r gnutls lame libass lib
 		--host-cflags="$(CFLAGS_FOR_BUILD)" \
 		--host-ldflags="$(LDFLAGS_FOR_BUILD)" \
 		--enable-ffplay \
-		--enable-gnutls \
 		--enable-gpl \
 		--enable-libaom \
 		--enable-libdav1d \

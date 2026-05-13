@@ -20,7 +20,6 @@ flac: flac-setup libogg
 		$(DEFAULT_CONFIGURE_FLAGS) \
 		--disable-dependency-tracking \
 		--disable-debug \
-		--enable-shared \
 		--disable-silent-rules \
 		--disable-xmms-plugin \
 		--disable-rpath \

@@ -6,18 +6,52 @@ SUBPROJECTS   += qt
 QT_VERSION    := 6.5.3
 DEB_QT_V      ?= $(QT_VERSION)
 
+space := $(subst ,, )
 
+QT_SUBMODULES = qt5compat qtbase qtdeclarative qtshadertools qtsvg qttools qttranslations
+QT_SUBMODULES_WITH_COMMAS = $(subst $(space),$(comma),$(QT_SUBMODULES))
+
+SUBMODULES_FLAGS = -submodules $(QT_SUBMODULES_WITH_COMMAS)
+
+ifneq ($(wildcard $(BUILD_WORK)/qt/.setup-complete),)
+qt-setup:
+	@echo "Qt build tree already setupped"
+else
 qt-setup: setup libpng16-setup
-	$(call GITHUB_ARCHIVE,qt,qtbase,$(QT_VERSION),$(QT_VERSION))
-	$(call EXTRACT_TAR,qtbase-$(QT_VERSION).tar.gz,qtbase-$(QT_VERSION),qt)
-	
-	# Bundle an updated libpng too since I can't let qt find the system one :'(
-	$(BUILD_WORK)/qt/src/3rdparty/libpng/import_from_libpng_tarball.sh \
-		$(BUILD_WORK)/libpng16 \
-		$(BUILD_WORK)/qt/src/3rdparty/libpng
-	
+	# Download qt main build tree and all the submodules needed
+	$(call GITHUB_ARCHIVE,qt,qt5,$(QT_VERSION),v$(QT_VERSION))
+	for module in $(QT_SUBMODULES); do \
+  		if [ ! -f "$(BUILD_SOURCE)/$${module}-$(QT_VERSION).tar.gz" ]; then \
+		  cd $(BUILD_SOURCE); \
+		  wget https://github.com/qt/$${module}/archive/v$(QT_VERSION).tar.gz \
+		    -O $${module}-$(QT_VERSION).tar.gz; \
+  		fi \
+	done
+
+	# Recreate the entire build tree
+	$(call EXTRACT_TAR,qt5-$(QT_VERSION).tar.gz,qt5-$(QT_VERSION),qt)
+	rm -r $(BUILD_WORK)/qt/{$(QT_SUBMODULES_WITH_COMMAS)}
+	for module in $(QT_SUBMODULES); do \
+	  cd $(BUILD_WORK); \
+	  tar -xf "$(BUILD_SOURCE)/$${module}-$(QT_VERSION).tar.gz"; \
+	  mkdir qt/$${module}; \
+	  cp -a $${module}-$(QT_VERSION)/. qt/$${module}; \
+	  rm -rf $${module}-$(QT_VERSION); \
+	done
+	cd $(BUILD_WORK)/qt/qttools/src/assistant && \
+		git clone https://code.qt.io/playground/qlitehtml.git --recursive && \
+		rm -rf qlitehtml/.git
+
 	mkdir -p $(BUILD_WORK)/qt/build-macos
 	mkdir -p $(BUILD_WORK)/qt/build-ios
+
+	# Bundle an updated libpng too since I can't get qt finding the system one :'(
+	$(BUILD_WORK)/qt/qtbase/src/3rdparty/libpng/import_from_libpng_tarball.sh \
+		$(BUILD_WORK)/libpng16 \
+		$(BUILD_WORK)/qt/qtbase/src/3rdparty/libpng
+
+	touch $(BUILD_WORK)/qt/.setup-complete
+endif
 
 ifneq ($(wildcard $(BUILD_WORK)/qt/.macos_build_complete),)
 qt-macos:
@@ -30,12 +64,15 @@ qt-macos: qt-setup
 		../configure \
 		-prefix $(BUILD_WORK)/qt/macos-qt \
 		-release \
+		-static \
 		-system-zlib \
 		-qt-libjpeg \
-		-no-libpng \
+		-qt-libpng \
 		-qt-freetype \
 		-qt-pcre \
-		-qt-harfbuzz
+		-qt-harfbuzz \
+		$(SUBMODULES_FLAGS) \
+		-feature-assistant
 	cmake --build $(BUILD_WORK)/qt/build-macos --parallel
 	cmake --install $(BUILD_WORK)/qt/build-macos
 	touch $(BUILD_WORK)/qt/.macos_build_complete
@@ -51,9 +88,11 @@ qt: qt-setup qt-macos libpng16
 		../configure \
 		-platform macx-ios-clang \
 		-release \
+		-static \
 		-qt-host-path $(BUILD_WORK)/qt/macos-qt \
 		-sdk iphoneos \
-		-prefix $(BUILD_STAGE)/qt
+		-prefix $(BUILD_STAGE)/qt \
+		$(SUBMODULES_FLAGS)
 	cmake --build $(BUILD_WORK)/qt/build-ios --parallel
 	cmake --install $(BUILD_WORK)/qt/build-ios
 	$(call AFTER_BUILD,copy)

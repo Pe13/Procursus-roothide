@@ -1,0 +1,21 @@
+# Please populate relevant fields and remove unneeded ones
+# (including this comment!) before building packages or
+# making a pull request.
+# 
+# Keep @DEB_SOURCEKIT_LSP_V@, @DEB_ARCH@ and @DEB_MAINTAINER@ intact,
+# these are populated at build time.
+#
+# If you need to write a platform-specific control file,
+# append the platform to the filename as an extension
+# e.g. sourcekit-lsp.control.macosx
+#
+Package: sourcekit-lsp
+Version: @DEB_SOURCEKIT_LSP_V@
+Architecture: @DEB_ARCH@
+Maintainer: @DEB_MAINTAINER@
+Author: 
+Depends:
+Section: 
+Priority:
+Homepage:
+Description:

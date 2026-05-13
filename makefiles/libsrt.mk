@@ -18,7 +18,7 @@ libsrt: libsrt-setup openssl
 	cd $(BUILD_WORK)/libsrt && cmake . \
 		$(DEFAULT_CMAKE_FLAGS) \
 		-DCOMMON_ARCH=$(DEB_ARCH) \
-		-DBUILD_SHARED_LIBS=true \
+		-DENABLE_SHARED=OFF \
 		-DWITH_OPENSSL_INCLUDEDIR=$(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/openssl \
 		-DWITH_OPENSSL_LIBDIR=$(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib
 	+$(MAKE) -C $(BUILD_WORK)/libsrt install \

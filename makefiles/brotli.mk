@@ -22,13 +22,6 @@ brotli: brotli-setup
 	+$(MAKE) -C $(BUILD_WORK)/brotli
 	+$(MAKE) -C $(BUILD_WORK)/brotli install \
 		DESTDIR="$(BUILD_STAGE)/brotli"
-	# Then build dynamic
-	cd $(BUILD_WORK)/brotli && cmake . \
-		$(DEFAULT_CMAKE_FLAGS) \
-		-DBUILD_SHARED_LIBS=ON
-	+$(MAKE) -C $(BUILD_WORK)/brotli
-	+$(MAKE) -C $(BUILD_WORK)/brotli install \
-		DESTDIR="$(BUILD_STAGE)/brotli"
 	$(call AFTER_BUILD,copy)
 endif
 

@@ -3,7 +3,7 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS   += meson
-MESON_VERSION := 0.64.0
+MESON_VERSION := 1.10.0
 DEB_MESON_V   ?= $(MESON_VERSION)
 
 meson-setup: setup
@@ -14,7 +14,7 @@ ifneq ($(wildcard $(BUILD_WORK)/meson/.build_complete),)
 meson:
 	@echo "Using previously built meson."
 else
-meson: meson-setup python3 ninja
+meson: meson-setup
 	cd $(BUILD_WORK)/meson && $(DEFAULT_SETUP_PY_ENV) python3 ./setup.py build \
 		--executable="$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/bin/python3" \
 		install \

@@ -3,22 +3,21 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS        += googletest
-GOOGLETEST_VERSION := 1.12.1
+GOOGLETEST_VERSION := 1.17.0
 DEB_GOOGLETEST_V   ?= $(GOOGLETEST_VERSION)
 
 googletest-setup: setup
-	$(call GITHUB_ARCHIVE,google,googletest,$(GOOGLETEST_VERSION),release-$(GOOGLETEST_VERSION))
-	$(call EXTRACT_TAR,googletest-$(GOOGLETEST_VERSION).tar.gz,googletest-release-$(GOOGLETEST_VERSION),googletest)
+	$(call DOWNLOAD_FILE,$(BUILD_SOURCE)/googletest-$(GOOGLETEST_VERSION).tar.gz,https://github.com/google/googletest/releases/download/v$(GOOGLETEST_VERSION)/googletest-$(GOOGLETEST_VERSION).tar.gz)
+	$(call EXTRACT_TAR,googletest-$(GOOGLETEST_VERSION).tar.gz,googletest-$(GOOGLETEST_VERSION),googletest)
 
 ifneq ($(wildcard $(BUILD_WORK)/googletest/.build_complete),)
 googletest:
 	@echo "Using previously built googletest."
 else
 googletest: googletest-setup
-	mkdir -p $(BUILD_WORK)/googletest/build
-	cd $(BUILD_WORK)/googletest/build && cmake . \
+	cmake -S $(BUILD_WORK)/googletest/ \
+		-B $(BUILD_WORK)/googletest/build \
 		$(DEFAULT_CMAKE_FLAGS) \
-		-DBUILD_SHARED_LIBS=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib \
 		-Dgtest_build_tests=OFF \
 		..

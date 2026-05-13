@@ -3,23 +3,24 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS        += libsndfile
-LIBSNDFILE_VERSION := 1.0.31
+LIBSNDFILE_VERSION := 1.2.2
 DEB_LIBSNDFILE_V   ?= $(LIBSNDFILE_VERSION)
 
 libsndfile-setup: setup
 	$(call DOWNLOAD_FILES,$(BUILD_SOURCE), \
-		https://github.com/libsndfile/libsndfile/releases/download/$(LIBSNDFILE_VERSION)/libsndfile-$(LIBSNDFILE_VERSION).tar.bz2)
-	$(call EXTRACT_TAR,libsndfile-$(LIBSNDFILE_VERSION).tar.bz2,libsndfile-$(LIBSNDFILE_VERSION),libsndfile)
+		https://github.com/libsndfile/libsndfile/releases/download/$(LIBSNDFILE_VERSION)/libsndfile-$(LIBSNDFILE_VERSION).tar.xz)
+	$(call EXTRACT_TAR,libsndfile-$(LIBSNDFILE_VERSION).tar.xz,libsndfile-$(LIBSNDFILE_VERSION),libsndfile)
 
 ifneq ($(wildcard $(BUILD_WORK)/libsndfile/.build_complete),)
 libsndfile:
 	@echo "Using previously built libsndfile."
 else
-libsndfile: libsndfile-setup flac libogg libvorbis libopus
-	cd $(BUILD_WORK)/libsndfile && ./configure -C \
-		$(DEFAULT_CONFIGURE_FLAGS)
-	+$(MAKE) -C $(BUILD_WORK)/libsndfile
-	+$(MAKE) -C $(BUILD_WORK)/libsndfile install \
+libsndfile: libsndfile-setup flac lame libogg libvorbis libopus mpg123
+	cmake -S $(BUILD_WORK)/libsndfile -B $(BUILD_WORK)/libsndfile/build \
+		$(DEFAULT_CMAKE_FLAGS) \
+		-DBUILD_TESTING=OFF
+	+$(MAKE) -C $(BUILD_WORK)/libsndfile/build
+	+$(MAKE) -C $(BUILD_WORK)/libsndfile/build install \
 		DESTDIR=$(BUILD_STAGE)/libsndfile
 	$(call AFTER_BUILD,copy)
 endif

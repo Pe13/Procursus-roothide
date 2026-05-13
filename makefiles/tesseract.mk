@@ -3,7 +3,7 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS       += tesseract
-TESSERACT_VERSION := 5.1.0
+TESSERACT_VERSION := 5.5.2
 DEB_TESSERACT_V   ?= $(TESSERACT_VERSION)
 
 ###
@@ -16,6 +16,7 @@ DEB_TESSERACT_V   ?= $(TESSERACT_VERSION)
 tesseract-setup: setup
 	$(call GITHUB_ARCHIVE,tesseract-ocr,tesseract,$(TESSERACT_VERSION),$(TESSERACT_VERSION))
 	$(call EXTRACT_TAR,tesseract-$(TESSERACT_VERSION).tar.gz,tesseract-$(TESSERACT_VERSION),tesseract)
+	$(call DO_PATCH,tesseract,tesseract,-p1)
 
 ifneq ($(wildcard $(BUILD_WORK)/tesseract/.build_complete),)
 tesseract:
@@ -31,6 +32,11 @@ tesseract: tesseract-setup leptonica libarchive curl
 	+$(MAKE) -C $(BUILD_WORK)/tesseract
 	+$(MAKE) -C $(BUILD_WORK)/tesseract install \
 		DESTDIR="$(BUILD_STAGE)/tesseract"
+	#	cmake -S $(BUILD_WORK)/tesseract -B $(BUILD_WORK)/tesseract/build \
+	#		$(DEFAULT_CMAKE_FLAGS)
+	#	+$(MAKE) -C $(BUILD_WORK)/tesseract/build
+	#	+$(MAKE) -C $(BUILD_WORK)/tesseract/build install \
+	#		DESTDIR="$(BUILD_STAGE)/tesseract"
 	$(call AFTER_BUILD,copy)
 endif
 

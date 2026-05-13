@@ -10,7 +10,6 @@ dav1d-setup: setup
 	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://downloads.videolan.org/pub/videolan/dav1d/$(DAV1D_VERSION)/dav1d-$(DAV1D_VERSION).tar.xz)
 	$(call EXTRACT_TAR,dav1d-$(DAV1D_VERSION).tar.xz,dav1d-$(DAV1D_VERSION),dav1d)
 	mkdir -p $(BUILD_WORK)/dav1d/build
-
 	echo -e "[host_machine]\n \
 	cpu_family = '$(shell echo $(GNU_HOST_TRIPLE) | cut -d- -f1)'\n \
 	cpu = '$(MEMO_ARCH)'\n \
@@ -20,10 +19,13 @@ dav1d-setup: setup
 	root = '$(BUILD_BASE)'\n \
 	[built-in options]\n \
 	prefix ='$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)'\n \
+	sysconfdir='$(MEMO_PREFIX)/etc'\n \
+	localstatedir='$(MEMO_PREFIX)/var'\n \
+	default_library='static'\n \
 	[binaries]\n \
 	c = '$(CC)'\n \
 	cpp = '$(CXX)'\n \
-	pkgconfig = '$(BUILD_TOOLS)/cross-pkg-config'\n" > $(BUILD_WORK)/dav1d/build/cross.txt
+	pkg-config = '$(BUILD_TOOLS)/static-cross-pkg-config'\n" > $(BUILD_WORK)/dav1d/build/cross.txt
 
 ifneq ($(wildcard $(BUILD_WORK)/dav1d/.build_complete),)
 dav1d:

@@ -20,7 +20,9 @@ else
 libjpeg-turbo: libjpeg-turbo-setup
 	cd $(BUILD_WORK)/libjpeg-turbo && cmake . \
 		$(DEFAULT_CMAKE_FLAGS) \
-		-DCOMMON_ARCH=$(DEB_ARCH)
+		-DCOMMON_ARCH=$(DEB_ARCH) \
+		-DENABLE_SHARED=OFF \
+		-DENABLE_STATIC=ON
 	sed -i 's|define JPEG_LIB_VERSION  62|define JPEG_LIB_VERSION  80|g' $(BUILD_WORK)/libjpeg-turbo/jconfig.h
 	+$(MAKE) -C $(BUILD_WORK)/libjpeg-turbo
 	+$(MAKE) -C $(BUILD_WORK)/libjpeg-turbo install \

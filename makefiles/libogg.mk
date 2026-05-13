@@ -19,8 +19,7 @@ libogg:
 else
 libogg: libogg-setup
 	cd $(BUILD_WORK)/libogg && ./configure -C \
-		$(DEFAULT_CONFIGURE_FLAGS) \
-		--disable-dependency-tracking
+		$(DEFAULT_CONFIGURE_FLAGS)
 	+$(MAKE) -C $(BUILD_WORK)/libogg
 	+$(MAKE) -C $(BUILD_WORK)/libogg install \
 		DESTDIR=$(BUILD_STAGE)/libogg

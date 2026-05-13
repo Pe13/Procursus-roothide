@@ -22,6 +22,7 @@ p11-kit: p11-kit-setup gettext libtasn1 libffi
 		$(DEFAULT_CONFIGURE_FLAGS) \
 		--with-trust-paths=$(MEMO_PREFIX)/etc/ssl/certs/cacert.pem \
 		--disable-static \
+		--enable-shared=yes \
 		--without-systemd \
 		--enable-debug=no \
 		--enable-nls

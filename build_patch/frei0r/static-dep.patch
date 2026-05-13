@@ -1,0 +1,100 @@
+--- a/cmake/modules/FindCairo.cmake.orig	2022-03-27 23:00:02
++++ b/cmake/modules/FindCairo.cmake	2026-01-05 13:39:25
+@@ -1,41 +1,67 @@
+ # - Try to find Cairo
+-# Once done, this will define
+-#
++# Once done, this will define:
+ #  Cairo_FOUND - system has Cairo
+ #  Cairo_INCLUDE_DIRS - the Cairo include directories
+ #  Cairo_LIBRARIES - link these to use Cairo
++#  Cairo_LIBRARY   - (Legacy support) Same as Cairo_LIBRARIES
+ 
+-include(LibFindMacros)
++find_package(PkgConfig QUIET)
++if(PKG_CONFIG_FOUND)
++    pkg_check_modules(PC_CAIRO QUIET cairo)
++endif()
+ 
+-# Freetype is not necessarily required on all platforms...
+-if(NOT WIN32)
+-  set(cairo_needs_freetype true)
+-endif(NOT WIN32)
+-
+-# Dependencies
+-if(cairo_needs_freetype)
+-  libfind_package(Cairo Freetype)
+-endif(cairo_needs_freetype)
+-
+-# Use pkg-config to get hints about paths
+-libfind_pkg_check_modules(Cairo_PKGCONF cairo)
+-
+-# Include dir
++# 1. Find the Include Directory
+ find_path(Cairo_INCLUDE_DIR
+-  NAMES cairo.h
+-  HINTS ${Cairo_PKGCONF_INCLUDE_DIRS}
+-  PATH_SUFFIXES cairo
++        NAMES cairo.h
++        HINTS ${PC_CAIRO_INCLUDE_DIRS}
++        PATH_SUFFIXES cairo
+ )
+ 
+-# Finally the library itself
+-find_library(Cairo_LIBRARY
+-  NAMES cairo
+-  HINTS ${Cairo_PKGCONF_LIBRARY_DIRS}
++# 2. Find the Main Library
++find_library(Cairo_LIBRARY_SINGLE
++        NAMES cairo
++        HINTS ${PC_CAIRO_LIBRARY_DIRS}
+ )
+ 
+-# Set the include dir variables and the libraries and let libfind_process do the rest.
+-# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+-set(Cairo_PROCESS_INCLUDES Cairo_INCLUDE_DIR)
+-set(Cairo_PROCESS_LIBS Cairo_LIBRARY)
++include(FindPackageHandleStandardArgs)
++find_package_handle_standard_args(Cairo
++        DEFAULT_MSG
++        Cairo_LIBRARY_SINGLE Cairo_INCLUDE_DIR
++)
+ 
+-libfind_process(Cairo)
++if(Cairo_FOUND)
++    set(Cairo_INCLUDE_DIRS ${Cairo_INCLUDE_DIR})
++
++    # Start with the main library found
++    set(Cairo_LIBS_LIST ${Cairo_LIBRARY_SINGLE})
++
++    # 3. AUTO-DETECTION: Check if the library is Static (.a)
++    get_filename_component(CAIRO_LIB_EXT "${Cairo_LIBRARY_SINGLE}" EXT)
++
++    # If it is a static archive, append the private dependencies
++    if(CAIRO_LIB_EXT STREQUAL ".a" AND PC_CAIRO_FOUND)
++        message(STATUS "Cairo detected as static library (${Cairo_LIBRARY_SINGLE}). creating static dependency chain.")
++
++        # Add static libs (pixman, png, freetype, etc.)
++        list(APPEND Cairo_LIBS_LIST ${PC_CAIRO_STATIC_LIBRARIES})
++
++        # Add platform flags (e.g. -framework CoreGraphics for iOS/Mac)
++        if(PC_CAIRO_STATIC_LDFLAGS_OTHER)
++            list(APPEND Cairo_LIBS_LIST ${PC_CAIRO_STATIC_LDFLAGS_OTHER})
++        endif()
++
++        # Add search paths for the dependencies
++        foreach(_lib_dir ${PC_CAIRO_STATIC_LIBRARY_DIRS})
++            link_directories(${_lib_dir})
++        endforeach()
++    endif()
++
++    # 4. Final Variable Assignment
++    set(Cairo_LIBRARIES ${Cairo_LIBS_LIST})
++
++    # HACK: Force the singular variable to hold the list
++    # (Fixes link errors in CMakeLists that use Cairo_LIBRARY instead of LIBRARIES)
++    set(Cairo_LIBRARY ${Cairo_LIBS_LIST} CACHE INTERNAL "Cairo Libraries" FORCE)
++
++    mark_as_advanced(Cairo_INCLUDE_DIR Cairo_LIBRARY_SINGLE)
++endif()
+\ No newline at end of file

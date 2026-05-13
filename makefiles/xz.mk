@@ -3,11 +3,11 @@ $(error Use the main Makefile)
 endif
 
 STRAPPROJECTS += xz
-XZ_VERSION    := 5.4.4
+XZ_VERSION    := 5.8.2
 DEB_XZ_V      ?= $(XZ_VERSION)
 
 xz-setup: setup
-	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://web.archive.org/web/20230930004231id_/https://tukaani.org/xz/xz-5.4.4.tar.xz{.sig$(comma)})
+	$(call DOWNLOAD_FILE,$(BUILD_SOURCE)/xz-$(XZ_VERSION).tar.xz,https://github.com/tukaani-project/xz/releases/download/v$(XZ_VERSION)/xz-$(XZ_VERSION).tar.xz)
 	$(call PGP_VERIFY,xz-$(XZ_VERSION).tar.xz)
 	$(call EXTRACT_TAR,xz-$(XZ_VERSION).tar.xz,xz-$(XZ_VERSION),xz)
 
@@ -18,26 +18,31 @@ else
 xz: xz-setup gettext
 	cd $(BUILD_WORK)/xz && ./configure -C \
 		$(DEFAULT_CONFIGURE_FLAGS) \
-		--libdir="$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)$(MEMO_ALT_PREFIX)/lib" \
+		--enable-shared=yes \
+		--enable-static=yes \
 		--enable-threads \
 		--disable-xzdec \
 		--disable-lzmadec \
 		--enable-nls \
 		--with-libintl-prefix="$(BUILD_BASE)/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)"
-	+$(MAKE) -C $(BUILD_WORK)/xz install \
-		DESTDIR="$(BUILD_STAGE)/xz"
-	cd $(BUILD_WORK)/xz && ./configure -C \
-		$(DEFAULT_CONFIGURE_FLAGS) \
-		--disable-shared \
-		--enable-nls \
-		--disable-encoders \
-		--enable-small \
-		--disable-threads \
-		--disable-lzmainfo \
-		--disable-scripts \
-		--disable-xz \
-		--disable-lzma-links \
-		--with-libintl-prefix="$(BUILD_BASE)/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)"
+	#	cmake -S $(BUILD_WORK)/xz -B $(BUILD_WORK)/xz/build \
+	#		$(DEFAULT_CMAKE_FLAGS)
+	#	+$(MAKE) -C $(BUILD_WORK)/xz/build \
+	#		DESTDIR="$(BUILD_STAGE)/xz"
+	#	+$(MAKE) -C $(BUILD_WORK)/xz/build install \
+	#		DESTDIR="$(BUILD_STAGE)/xz"
+	#	cd $(BUILD_WORK)/xz && ./configure -C \
+	#		$(DEFAULT_CONFIGURE_FLAGS) \
+	#		--disable-shared \
+	#		--enable-nls \
+	#		--disable-encoders \
+	#		--enable-small \
+	#		--disable-threads \
+	#		--disable-lzmainfo \
+	#		--disable-scripts \
+	#		--disable-xz \
+	#		--disable-lzma-links \
+	#		--with-libintl-prefix="$(BUILD_BASE)/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)"
 	+$(MAKE) -C $(BUILD_WORK)/xz install \
 		DESTDIR="$(BUILD_STAGE)/xz"
 	$(call AFTER_BUILD,copy)

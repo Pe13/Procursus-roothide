@@ -30,6 +30,8 @@ endif
 
 RELATIVE_RPATH       := 0
 
+NO_PGP=1
+
 MEMO_TARGET          ?= iphoneos-arm64
 MEMO_CFVER           ?= 1700
 # iOS 13.0 == 1665.15.
@@ -620,15 +622,18 @@ DEFAULT_CMAKE_FLAGS := \
 	-DCMAKE_SYSTEM_PROCESSOR="$(shell echo $(GNU_HOST_TRIPLE) | cut -f1 -d-)" \
 	-DCMAKE_C_FLAGS="$(CFLAGS)" \
 	-DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
+	-DCMAKE_ASM_FLAGS="$(PLATFORM_VERSION_MIN)" \
 	-DCMAKE_FIND_ROOT_PATH="$(BUILD_BASE)" \
-	-DPKG_CONFIG_EXECUTABLE="$(BUILD_TOOLS)/cross-pkg-config" \
+	-DPKG_CONFIG_EXECUTABLE="$(BUILD_TOOLS)/static-cross-pkg-config" \
 	-DCMAKE_INSTALL_NAME_TOOL="$(I_N_T)" \
 	-DCMAKE_INSTALL_PREFIX="$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)" \
 	-DCMAKE_INSTALL_NAME_DIR="$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib" \
 	-DCMAKE_INSTALL_RPATH="$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)" \
 	-DCMAKE_INSTALL_SYSCONFDIR="$(MEMO_PREFIX)/etc" \
 	-DCMAKE_OSX_SYSROOT="$(TARGET_SYSROOT)" \
-	-DCMAKE_OSX_ARCHITECTURES="$(MEMO_ARCH)"
+	-DCMAKE_OSX_ARCHITECTURES="$(MEMO_ARCH)" \
+	-DBUILD_SHARED_LIBS=OFF
+#	-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0
 
 BUILD_CONFIGURE_FLAGS := \
 	--build=$$($(BUILD_MISC)/config.guess) \
@@ -640,7 +645,7 @@ BUILD_CONFIGURE_FLAGS := \
 	AR="$(AR_FOR_BUILD)" \
 	RANLIB="$(RANLIB_FOR_BUILD)" \
 	STRIP="$(STRIP_FOR_BUILD)" \
-	CFLAGS="$(CFLAGS_FOR_BUILD)" \
+	CFLAGS="$(CFLAGS_FOR_BUILD) -v" \
 	CXXFLAGS="$(CXXFLAGS_FOR_BUILD)" \
 	CPPFLAGS="$(CPPFLAGS_FOR_BUILD)" \
 	ASFLAGS="$(ASFLAGS_FOR_BUILD)" \
@@ -656,7 +661,7 @@ DEFAULT_CONFIGURE_FLAGS := \
 	--mandir=$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/share/man \
 	--enable-silent-rules \
 	--disable-dependency-tracking \
-	--enable-shared \
+	--enable-shared=no \
 	--enable-static
 
 DEFAULT_PERL_MAKE_FLAGS := \
@@ -717,7 +722,7 @@ DEFAULT_SETUP_PY_ENV := \
 
 DEFAULT_RUST_FLAGS := \
 	$(MEMO_DEPLOYMENT) \
-	SDKROOT="$(TARGET_SYSROOT)" \
+#	SDKROOT="$(TARGET_SYSROOT)"
 	PKG_CONFIG="$(RUST_TARGET)-pkg-config" \
 	RUSTFLAGS="-L $(BUILD_BASE)/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/lib"
 
@@ -1357,6 +1362,12 @@ rebuild-%:
 	rm -rf $(BUILD_STAGE)/$(REPROJ2)
 	+$(MAKE) $(REPROJ)
 
+remove-%:
+	@[ -n "$(BUILD_BASE)" ] && [ -n "$(REPROJ2)" ] || (echo "Error: Vars undefined"; exit 1)
+	@echo Remove $(REPROJ2)
+	cd $(BUILD_STAGE)/$(REPROJ2) && find . -mindepth 1 -not -type d | xargs -I {} rm -f $(BUILD_BASE)/{}
+	cd $(BUILD_STAGE)/$(REPROJ2) && find . -mindepth 1 -type d -empty | xargs -I {} rmdir $(BUILD_BASE)/{} 2>/dev/null || true
+
 %-deps: %
 	@${BUILD_TOOLS}/find_deps.sh $(BUILD_STAGE)/$^
 
@@ -1534,6 +1545,8 @@ endif
 
 	@mkdir -p $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/{CoreAudio,CoreFoundation}
 	@cp -af $(MACOSX_SYSROOT)/System/Library/Frameworks/CoreAudio.framework/Headers/* $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/CoreAudio
+
+	@#if [ ! -d $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/c++ ]; then mkdir -p $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/c++/v1; cp -arf /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/usr/include/c++/v1/stdlib.h $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/c++/v1; fi
 
 	@# Patch headers from $(BARE_PLATFORM).sdk
 	@if [ -f $(TARGET_SYSROOT)/System/Library/Frameworks/CoreFoundation.framework/Headers/CFUserNotification.h ]; then sed -E 's/API_UNAVAILABLE(ios, watchos, tvos)//g' < $(TARGET_SYSROOT)/System/Library/Frameworks/CoreFoundation.framework/Headers/CFUserNotification.h > $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/CoreFoundation/CFUserNotification.h; fi

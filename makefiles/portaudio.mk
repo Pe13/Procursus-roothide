@@ -21,17 +21,23 @@ portaudio:
 	@echo "Using previously built portaudio."
 else
 portaudio: portaudio-setup
-	cd $(BUILD_WORK)/portaudio && autoreconf -fi
-	cd $(BUILD_WORK)/portaudio/bindings/cpp && autoreconf -fi
-	sed -i 's/-keep_private_externs -nostdlib/-keep_private_externs $(PLATFORM_VERSION_MIN) -arch $(MEMO_ARCH) -nostdlib/g' $(BUILD_WORK)/portaudio/{,bindings/cpp}/configure
-	cd $(BUILD_WORK)/portaudio && ./configure -C \
-		$(DEFAULT_CONFIGURE_FLAGS) \
-		--enable-cxx \
-		CC="$(CC) $(CFLAGS)"
-	+$(MAKE) -C $(BUILD_WORK)/portaudio lib/libportaudio.la
-	+$(MAKE) -C $(BUILD_WORK)/portaudio
-	+$(MAKE) -C $(BUILD_WORK)/portaudio install \
-		DESTDIR=$(BUILD_STAGE)/portaudio
+	#	cd $(BUILD_WORK)/portaudio && autoreconf -fi
+	#	cd $(BUILD_WORK)/portaudio/bindings/cpp && autoreconf -fi
+	#	sed -i 's/-keep_private_externs -nostdlib/-keep_private_externs $(PLATFORM_VERSION_MIN) -arch $(MEMO_ARCH) -nostdlib/g' $(BUILD_WORK)/portaudio/{,bindings/cpp}/configure
+	#	cd $(BUILD_WORK)/portaudio && ./configure -C \
+	#		$(DEFAULT_CONFIGURE_FLAGS) \
+	#		--enable-cxx \
+	#		CC="$(CC) $(CFLAGS)"
+	#	+$(MAKE) -C $(BUILD_WORK)/portaudio lib/libportaudio.la
+	#	+$(MAKE) -C $(BUILD_WORK)/portaudio
+	#	+$(MAKE) -C $(BUILD_WORK)/portaudio install \
+	#		DESTDIR=$(BUILD_STAGE)/portaudio
+	cmake -S $(BUILD_WORK)/portaudio -B $(BUILD_WORK)/portaudio/build \
+		$(DEFAULT_CMAKE_FLAGS) \
+		-DPA_BUILD_SHARED=OFF
+	+$(MAKE) -C $(BUILD_WORK)/portaudio/build
+	+$(MAKE) -C $(BUILD_WORK)/portaudio/build install \
+		DESTDIR="$(BUILD_STAGE)/portaudio"
 	$(call AFTER_BUILD,copy)
 endif
 
