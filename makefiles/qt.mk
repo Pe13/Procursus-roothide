@@ -42,7 +42,7 @@ qt-setup: setup libpng16-setup
 		git clone https://code.qt.io/playground/qlitehtml.git --recursive && \
 		rm -rf qlitehtml/.git
 
-	mkdir -p $(BUILD_WORK)/qt/build-macos
+	mkdir -p $(BUILD_WORK)/qt/build-host
 	mkdir -p $(BUILD_WORK)/qt/build-ios
 
 	# Bundle an updated libpng too since I can't get qt finding the system one :'(
@@ -53,16 +53,16 @@ qt-setup: setup libpng16-setup
 	touch $(BUILD_WORK)/qt/.setup-complete
 endif
 
-ifneq ($(wildcard $(BUILD_WORK)/qt/.macos_build_complete),)
-qt-macos:
-	@echo "Using previously built macos qt."
+ifneq ($(wildcard $(BUILD_WORK)/qt/.host_build_complete),)
+qt-host:
+	@echo "Using previously built host qt."
 else
-qt-macos: qt-setup
-	# Build for macos first, since this version won't probably match the system one
-	cd $(BUILD_WORK)/qt/build-macos && \
-		unset CFLAGS CXXFLAGS ASFLAGS CXXFLAGS CPPFLAGS LDFLAGS && \
+qt-host: qt-setup
+	# Build for host first, since this version won't probably match the system one
+	cd $(BUILD_WORK)/qt/build-host && \
+		unset CC CXX CPP CFLAGS CXXFLAGS ASFLAGS CXXFLAGS CPPFLAGS LDFLAGS && \
 		../configure \
-		-prefix $(BUILD_WORK)/qt/macos-qt \
+		-prefix $(BUILD_WORK)/qt/host-qt \
 		-release \
 		-static \
 		-system-zlib \
@@ -73,26 +73,34 @@ qt-macos: qt-setup
 		-qt-harfbuzz \
 		$(SUBMODULES_FLAGS) \
 		-feature-assistant
-	cmake --build $(BUILD_WORK)/qt/build-macos --parallel
-	cmake --install $(BUILD_WORK)/qt/build-macos
-	touch $(BUILD_WORK)/qt/.macos_build_complete
+	cmake --build $(BUILD_WORK)/qt/build-host --parallel
+	cmake --install $(BUILD_WORK)/qt/build-host
+	touch $(BUILD_WORK)/qt/.host_build_complete
 endif
 
 ifneq ($(wildcard $(BUILD_WORK)/qt/.build_complete),)
 qt:
 	@echo "Using previously built qt."
 else
-qt: qt-setup qt-macos libpng16
+qt: qt-setup qt-host libpng16
 	cd $(BUILD_WORK)/qt/build-ios && \
-		unset CFLAGS CXXFLAGS ASFLAGS CXXFLAGS CPPFLAGS LDFLAGS && \
+		export SDKROOT="$(TARGET_SYSROOT)" && \
+		export CFLAGS="$(CFLAGS) -DLIBIOSEXEC_INTERNAL" && \
+		export CXXFLAGS="$(CXXFLAGS) -DLIBIOSEXEC_INTERNAL" && \
+		export CPPFLAGS="$(CPPFLAGS) -DLIBIOSEXEC_INTERNAL" && \
 		../configure \
 		-platform macx-ios-clang \
 		-release \
 		-static \
-		-qt-host-path $(BUILD_WORK)/qt/macos-qt \
-		-sdk iphoneos \
+		-qt-host-path $(BUILD_WORK)/qt/host-qt \
 		-prefix $(BUILD_STAGE)/qt \
-		$(SUBMODULES_FLAGS)
+		$(SUBMODULES_FLAGS) \
+		-- \
+		-DCMAKE_C_FLAGS="$(CFLAGS) -DLIBIOSEXEC_INTERNAL" \
+		-DCMAKE_CXX_FLAGS="$(CXXFLAGS) -DLIBIOSEXEC_INTERNAL" \
+		-DCMAKE_TOOLCHAIN_FILE=$(BUILD_ROOT)/build_tools/cmake/ios.toolchain.cmake \
+		-DQT_UIKIT_SDK=iphoneos \
+		-DQT_BUILD_SIMULATOR=OFF
 	cmake --build $(BUILD_WORK)/qt/build-ios --parallel
 	cmake --install $(BUILD_WORK)/qt/build-ios
 	$(call AFTER_BUILD,copy)
