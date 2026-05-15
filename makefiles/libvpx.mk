@@ -19,7 +19,7 @@ endif
 libvpx-setup: setup
 	$(call GITHUB_ARCHIVE,webmproject,libvpx,$(LIBVPX_VERSION),v$(LIBVPX_VERSION))
 	$(call EXTRACT_TAR,libvpx-$(LIBVPX_VERSION).tar.gz,libvpx-$(LIBVPX_VERSION),libvpx)
-	sed -i 's/\[ "$$(show_darwin_sdk_major_version iphoneos)" -gt 8 \]/false/' $(BUILD_WORK)/libvpx/build/make/configure.sh
+	$(call DO_PATCH,libvpx,libvpx,-p1)
 
 ifneq ($(wildcard $(BUILD_WORK)/libvpx/.build_complete),)
 libvpx:
@@ -38,7 +38,8 @@ libvpx: libvpx-setup
 		--enable-vp9-temporal-denoising \
 		--enable-vp9-postproc \
 		--enable-vp9-highbitdepth \
-		$(LIBVPX_CONFIGURE_FLAGS)
+		$(LIBVPX_CONFIGURE_FLAGS) \
+		--as=yasm
 	+$(MAKE) -C $(BUILD_WORK)/libvpx
 	+$(MAKE) -C $(BUILD_WORK)/libvpx install \
 		DESTDIR=$(BUILD_STAGE)/libvpx

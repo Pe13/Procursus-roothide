@@ -1,0 +1,82 @@
+--- a/build/make/configure.sh	2026-05-15 15:37:14.039270611 +0200
++++ b/build/make/configure.sh	2026-05-15 15:37:14.043264002 +0200
+@@ -703,18 +703,17 @@
+ # Reliably find the newest available Darwin SDKs. (Older versions of
+ # xcrun don't support --show-sdk-path.)
+ show_darwin_sdk_path() {
+-  xcrun --sdk $1 --show-sdk-path 2>/dev/null ||
+-    xcodebuild -sdk $1 -version Path 2>/dev/null
++  echo "${SDKROOT}"
+ }
+ 
+ # Print the major version number of the Darwin SDK specified by $1.
+ show_darwin_sdk_major_version() {
+-  xcrun --sdk $1 --show-sdk-version 2>/dev/null | cut -d. -f1
++  echo "16"
+ }
+ 
+ # Print the Xcode version.
+ show_xcode_version() {
+-  xcodebuild -version | head -n1 | cut -d' ' -f2
++  echo "14.0"
+ }
+ 
+ # Fails when Xcode version is less than 6.3.
+@@ -1097,16 +1096,9 @@
+ 
+         darwin)
+           if ! enabled external_build; then
+-            XCRUN_FIND="xcrun --sdk iphoneos --find"
+-            CXX="$(${XCRUN_FIND} clang++)"
+-            CC="$(${XCRUN_FIND} clang)"
+-            AR="$(${XCRUN_FIND} ar)"
+-            AS="$(${XCRUN_FIND} as)"
+-            STRIP="$(${XCRUN_FIND} strip)"
+-            NM="$(${XCRUN_FIND} nm)"
+-            RANLIB="$(${XCRUN_FIND} ranlib)"
+-            AS_SFX=.S
+-            LD="${CXX:-$(${XCRUN_FIND} ld)}"
++            # Procursus provides the correct toolchain in the environment.
++            # Do not override CC, CXX, AR, etc. with xcrun.
++            LD="${CXX:-ld}"
+ 
+             # ASFLAGS is written here instead of using check_add_asflags
+             # because we need to overwrite all of ASFLAGS and purge the
+@@ -1121,35 +1113,9 @@
+               add_cflags -isysroot ${alt_libc}
+             fi
+ 
+-            if [ "${LD}" = "${CXX}" ]; then
+-              add_ldflags -miphoneos-version-min="${IOS_VERSION_MIN}"
+-            else
+-              add_ldflags -ios_version_min "${IOS_VERSION_MIN}"
+-            fi
++            # Prevent hardcoded minimum versions and bitcode which break our cctools
++            # (Deleted ios_version_min and fembed-bitcode logic)
+ 
+-            for d in lib usr/lib usr/lib/system; do
+-              try_dir="${alt_libc}/${d}"
+-              [ -d "${try_dir}" ] && add_ldflags -L"${try_dir}"
+-            done
+-
+-            case ${tgt_isa} in
+-              armv7|armv7s|armv8|arm64)
+-                if enabled neon && ! check_xcode_minimum_version; then
+-                  soft_disable neon
+-                  log_echo "  neon disabled: upgrade Xcode (need v6.3+)."
+-                  if enabled neon_asm; then
+-                    soft_disable neon_asm
+-                    log_echo "  neon_asm disabled: upgrade Xcode (need v6.3+)."
+-                  fi
+-                fi
+-                ;;
+-            esac
+-
+-            if [ "$(show_darwin_sdk_major_version iphoneos)" -gt 8 ]; then
+-              check_add_cflags -fembed-bitcode
+-              check_add_asflags -fembed-bitcode
+-              check_add_ldflags -fembed-bitcode
+-            fi
+           fi
+ 
+           asm_conversion_cmd="${source_path_mk}/build/make/ads2gas_apple.pl"
