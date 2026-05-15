@@ -16,6 +16,15 @@ libprotobuf:
 	@echo "Using previously built libprotobuf."
 else
 libprotobuf: libprotobuf-setup abseil
+	# Build host protoc
+	env -u CC -u CXX -u CFLAGS -u CXXFLAGS -u LDFLAGS -u PKG_CONFIG_PATH cmake -S $(BUILD_WORK)/libprotobuf -B $(BUILD_WORK)/libprotobuf/build-host \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_CXX_STANDARD=17 \
+		-Dprotobuf_BUILD_TESTS=OFF \
+		-Dprotobuf_BUILD_SHARED_LIBS=OFF \
+		-Dprotobuf_ABSL_PROVIDER=module
+	env -u CC -u CXX -u CFLAGS -u CXXFLAGS -u LDFLAGS -u PKG_CONFIG_PATH $(MAKE) -C $(BUILD_WORK)/libprotobuf/build-host protoc
+	# Build target libprotobuf
 	cmake -S $(BUILD_WORK)/libprotobuf -B $(BUILD_WORK)/libprotobuf/build \
 		$(DEFAULT_CMAKE_FLAGS) \
 		-DCMAKE_CXX_STANDARD=17 \
