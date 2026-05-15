@@ -11,6 +11,10 @@ DEB_X265_V     ?= $(X265_VERSION)
 
 x265-setup: setup
 	$(call GIT_CLONE,https://bitbucket.org/multicoreware/x265_git.git,$(X265_VERSION),x265)
+	# Patching CMake policies
+	sed -i 's/cmake_minimum_required(VERSION 2.8.8)/cmake_minimum_required(VERSION 3.10)/g' $(BUILD_WORK)/x265/source/CMakeLists.txt
+	sed -i 's/cmake_policy(SET CMP0025 OLD)/cmake_policy(SET CMP0025 NEW)/g' $(BUILD_WORK)/x265/source/CMakeLists.txt
+	sed -i 's/cmake_policy(SET CMP0054 OLD)/cmake_policy(SET CMP0054 NEW)/g' $(BUILD_WORK)/x265/source/CMakeLists.txt
 	sed -i 's/-mcpu=native//g' $(BUILD_WORK)/x265/source/dynamicHDR10/CMakeLists.txt
 
 ifneq ($(wildcard $(BUILD_WORK)/x265/.build_complete),)
