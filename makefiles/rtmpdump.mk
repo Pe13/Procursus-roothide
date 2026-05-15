@@ -20,6 +20,8 @@ rtmpdump: rtmpdump-setup nettle libgmp10 openssl
 	+$(MAKE) -C $(BUILD_WORK)/rtmpdump/librtmp install \
 		CC="$(CC)" \
 		LD="$(LD)" \
+		AR="$(AR)" \
+		RANLIB="$(RANLIB)" \
 		CRYPTO=OPENSSL \
 		XCFLAGS="$(CFLAGS)" \
 		XLDFLAGS="$(LDFLAGS)" \
