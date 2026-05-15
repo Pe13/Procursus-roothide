@@ -848,7 +848,7 @@ AFTER_BUILD = \
 	if [ ! -z "$(MEMO_PREFIX)" ] && [ -d "$(BUILD_STAGE)/$$pkg/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)" ]; then \
 		rm -f $(BUILD_STAGE)/$$pkg/._lib_cache && touch $(BUILD_STAGE)/$$pkg/._lib_cache; \
 		for file in $$(find $(BUILD_STAGE)/$$pkg -type f -exec sh -c "file -ib '{}' | grep -q 'x-mach-binary; charset=binary'" \; -print); do \
-			if [ $${file\#\#*.} != "a" ] && [ $${file\#\#*.} != "dSYM" ]; then \
+			if [ $${file\#\#*.} != "a" ] && [ $${file\#\#*.} != "dSYM" ] && [ $${file\#\#*.} != "o" ]; then \
 				INSTALL_NAME=$$($(OTOOL) -D $$file | grep -v -e ":$$" -e "^Archive :" | head -n1); \
 				if [ ! -z "$$INSTALL_NAME" ]; then \
 					$(I_N_T) -id @rpath/$$(basename $$INSTALL_NAME) $$file; \
@@ -858,7 +858,7 @@ AFTER_BUILD = \
 		done; \
 	fi; \
 	for file in $$(find $(BUILD_STAGE)/$$pkg -type f -exec sh -c "file -ib '{}' | grep -q 'x-mach-binary; charset=binary'" \; -print); do \
-		if [ $${file\#\#*.} != "a" ] && [ $${file\#\#*.} != "dSYM" ]; then \
+		if [ $${file\#\#*.} != "a" ] && [ $${file\#\#*.} != "dSYM" ] && [ $${file\#\#*.} != "o" ]; then \
 			if [ "$(RELATIVE_RPATH)" = "1" ]; then \
 				$(I_N_T) -add_rpath "@loader_path/$$(realpath --relative-to=$$(dirname $$file) $(BUILD_STAGE)/$$pkg/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX))/lib" $$file; \
 			else \
