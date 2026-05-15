@@ -10,14 +10,23 @@ openmp-setup: setup
 	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),https://github.com/llvm/llvm-project/releases/download/llvmorg-$(OPENMP_VERSION)/openmp-$(OPENMP_VERSION).src.tar.xz)
 	$(call EXTRACT_TAR,openmp-$(OPENMP_VERSION).src.tar.xz,openmp-$(OPENMP_VERSION).src,openmp)
 
+ifeq ($(shell uname -s),Linux)
+THE_LDFLAGS := -L$(BUILD_TOOLS)/lib/ -lclang_rt.ios
+OPENMP_LDFLAGS :=  -DCMAKE_EXE_LINKER_FLAGS="$(THE_LDFLAGS)" -DCMAKE_SHARED_LINKER_FLAGS="$(THE_LDFLAGS)"
+endif
+
 ifneq ($(wildcard $(BUILD_WORK)/openmp/.build_complete),)
 openmp:
 	@echo "Using previously built openmp."
 else
 openmp: openmp-setup
+	# Warning for Linux users: libclang_rt.ios.a can be found at https://www.dropbox.com/s/kvhk8yxxomy3tpn/libclang_rt.ios.a?dl=0
+	# Put it in build_tools/lib (Mac users should be fine)
+
 	# Shared lib
 	cd $(BUILD_WORK)/openmp && cmake . \
 		$(DEFAULT_CMAKE_FLAGS) \
+		$(OPENMP_LDFLAGS) \
 		-DLIBOMP_INSTALL_ALIASES=OFF \
 		-DLIBOMP_LIB_NAME=libomp.1 \
 		.
