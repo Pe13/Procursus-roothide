@@ -18,7 +18,7 @@ else
 xz: xz-setup gettext
 	cd $(BUILD_WORK)/xz && ./configure -C \
 		$(DEFAULT_CONFIGURE_FLAGS) \
-		--enable-shared=yes \
+		--enable-shared=no \
 		--enable-static=yes \
 		--enable-threads \
 		--disable-xzdec \
