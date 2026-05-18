@@ -93,7 +93,7 @@ qt: qt-setup qt-host libpng16
 		-release \
 		-static \
 		-qt-host-path $(BUILD_WORK)/qt/host-qt \
-		-prefix $(BUILD_STAGE)/qt \
+		-prefix $(BUILD_STAGE)/qt/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX) \
 		$(SUBMODULES_FLAGS) \
 		-- \
 		-DCMAKE_C_FLAGS="$(CFLAGS) -DLIBIOSEXEC_INTERNAL" \
