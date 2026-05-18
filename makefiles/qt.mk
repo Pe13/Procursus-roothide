@@ -83,6 +83,9 @@ qt:
 	@echo "Using previously built qt."
 else
 qt: qt-setup qt-host libpng16
+	# Qt relies on the SDK os/log.h, we must temporarily move the pure Darwin
+	# one away
+	mv $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/os/log.h $(BUILD_WORK)/log.h
 	cd $(BUILD_WORK)/qt/build-ios && \
 		export SDKROOT="$(TARGET_SYSROOT)" && \
 		export CFLAGS="$(CFLAGS) -DLIBIOSEXEC_INTERNAL" && \
@@ -103,6 +106,8 @@ qt: qt-setup qt-host libpng16
 		-DQT_BUILD_SIMULATOR=OFF
 	cmake --build $(BUILD_WORK)/qt/build-ios --parallel
 	cmake --install $(BUILD_WORK)/qt/build-ios
+	# Restore the Darwin log.h
+	mv $(BUILD_WORK)/log.h $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/os/log.h
 	$(call AFTER_BUILD,copy)
 endif
 
