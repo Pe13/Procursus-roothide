@@ -5,5 +5,5 @@
  Requires.private: lept
  Libs: -L${libdir} -ltesseract @libarchive_LIBS@ @libcurl_LIBS@
 -Libs.private: -lpthread
-+Libs.private: -lpthread -lc++ -framework Accelerate
++Libs.private: -lpthread -lc++ -framework Accelerate -lomp
  Cflags: -I${includedir}

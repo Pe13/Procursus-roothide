@@ -22,7 +22,7 @@ ifneq ($(wildcard $(BUILD_WORK)/tesseract/.build_complete),)
 tesseract:
 	@echo "Using previously built tesseract."
 else
-tesseract: tesseract-setup leptonica libarchive curl
+tesseract: tesseract-setup leptonica libarchive curl openmp
 	cd $(BUILD_WORK)/tesseract && ./autogen.sh
 	rm -f $(BUILD_WORK)/tesseract/VERSION # This, amazingly enough, makes compiling on macOS not work. (Non-case-sensitive)
 	cd $(BUILD_WORK)/tesseract && ./configure -C \
