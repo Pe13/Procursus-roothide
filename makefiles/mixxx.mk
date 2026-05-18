@@ -39,23 +39,28 @@ mixxx-build:
 	@echo "Using previously built mixxx."
 else
 mixxx-build: mixxx-setup $(MIXXX_DEPS)
+ifneq ($(UNAME),Linux)
 	if [ ! -d $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/c++ ]; then \
 		mkdir -p $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/c++/v1; \
 		cp -arf /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.2.sdk/usr/include/c++/v1/stdlib.h \
 		$(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/c++/v1; \
 		fi
+endif
 	# Cleanup previous build artifacts if any
 	rm -rf $(BUILD_WORK)/mixxx/Mixxx.tipa $(BUILD_WORK)/mixxx/Payload
-	unset CC CXX LD CFLAGS CPPFLAGS CXXFLAGS LDFLAGS &&  \
-		cmake -S $(BUILD_WORK)/mixxx -B $(BUILD_WORK)/mixxx/build \
-		-DCMAKE_CROSSCOMPILING=true \
-		-DCMAKE_SYSTEM_NAME=Darwin \
-		-DCMAKE_SYSTEM_PROCESSOR="$(shell echo $(GNU_HOST_TRIPLE) | cut -f1 -d-)" \
-		-DCMAKE_FIND_ROOT_PATH="$(BUILD_BASE)" \
-		-DPKG_CONFIG_EXECUTABLE="$(BUILD_TOOLS)/cross-pkg-config" \
-		-DCMAKE_OSX_SYSROOT="$(TARGET_SYSROOT)" \
-		-DCMAKE_OSX_ARCHITECTURES="$(MEMO_ARCH)" \
-		-G"Xcode" \
+	cmake -S $(BUILD_WORK)/mixxx -B $(BUILD_WORK)/mixxx/build \
+		$(DEFAULT_CMAKE_FLAGS) \
+		-DRIGHT_PROTOC="$(BUILD_WORK)/libprotobuf/build-host/protoc" \
+		-DCMAKE_PREFIX_PATH="$(BUILD_BASE)/usr/;$(TARGET_SYSROOT)/usr" \
+		-DCMAKE_FRAMEWORK_PATH="$(TARGET_SYSROOT)/Developer/Library/Frameworks;$(TARGET_SYSROOT)/System/Library/Frameworks" \
+		-DCMAKE_FIND_USE_CMAKE_PATH=ON \
+		-DCMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH=OFF \
+		-DCMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH=ON \
+		-DCMAKE_FIND_USE_CMAKE_SYSTEM_PATH=OFF \
+		-DCMAKE_FIND_USE_INSTALL_PREFIX=ON \
+		-DCMAKE_MAKE_PROGRAM="/usr/bin/ninja" \
+		-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 \
+		-G"Ninja" \
 		-DIOS=ON \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DQT6=ON \
@@ -66,12 +71,7 @@ mixxx-build: mixxx-setup $(MIXXX_DEPS)
 		-DBATTERY=OFF \
 		-DBUILD_BENCH=OFF \
 		-DBUILD_TESTING=OFF
-	unset CC CXX LD CFLAGS CPPFLAGS CXXFLAGS LDFLAGS && \
-		cmake --build $(BUILD_WORK)/mixxx/build --target mixxx --config RelWithDebInfo -- \
-		IPHONEOS_DEPLOYMENT_TARGET=14.0 \
-		CODE_SIGN_IDENTITY="" \
-		CODE_SIGNING_REQUIRED=NO \
-		OTHER_CPLUSPLUSFLAGS=" --std=c++20 -I$(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/c++/v1 -isystem$(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include"
+	cmake --build $(BUILD_WORK)/mixxx/build --target mixxx --config RelWithDebInfo
 	# Tipa time
 	mkdir $(BUILD_WORK)/mixxx/Payload
 	cp -a $(BUILD_WORK)/mixxx/build/RelWithDebInfo-iphoneos/Mixxx.app $(BUILD_WORK)/mixxx/Payload
