@@ -39,7 +39,8 @@ qt-setup: setup libpng16-setup
 	  rm -rf $${module}-$(QT_VERSION); \
 	done
 	cd $(BUILD_WORK)/qt/qttools/src/assistant && \
-		git clone https://code.qt.io/playground/qlitehtml.git --recursive && \
+		git clone https://code.qt.io/playground/qlitehtml.git && \
+		(cd qlitehtml && git checkout f05f78e && git submodule update --init --recursive) && \
 		rm -rf qlitehtml/.git
 
 	mkdir -p $(BUILD_WORK)/qt/build-host
@@ -88,9 +89,6 @@ qt: qt-setup qt-host libpng16
 	mv $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/os/log.h $(BUILD_WORK)/log.h
 	cd $(BUILD_WORK)/qt/build-ios && \
 		export SDKROOT="$(TARGET_SYSROOT)" && \
-		export CFLAGS="$(CFLAGS) -DLIBIOSEXEC_INTERNAL" && \
-		export CXXFLAGS="$(CXXFLAGS) -DLIBIOSEXEC_INTERNAL" && \
-		export CPPFLAGS="$(CPPFLAGS) -DLIBIOSEXEC_INTERNAL" && \
 		../configure \
 		-platform macx-ios-clang \
 		-release \
@@ -99,8 +97,6 @@ qt: qt-setup qt-host libpng16
 		-prefix $(BUILD_STAGE)/qt/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX) \
 		$(SUBMODULES_FLAGS) \
 		-- \
-		-DCMAKE_C_FLAGS="$(CFLAGS) -DLIBIOSEXEC_INTERNAL" \
-		-DCMAKE_CXX_FLAGS="$(CXXFLAGS) -DLIBIOSEXEC_INTERNAL" \
 		-DCMAKE_TOOLCHAIN_FILE=$(BUILD_ROOT)/build_tools/cmake/ios.toolchain.cmake \
 		-DQT_UIKIT_SDK=iphoneos \
 		-DQT_BUILD_SIMULATOR=OFF

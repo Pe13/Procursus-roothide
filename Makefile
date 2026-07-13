@@ -32,6 +32,8 @@ RELATIVE_RPATH       := 0
 
 NO_PGP=1
 
+MEMO_NO_IOSEXEC=1
+
 MEMO_TARGET          ?= iphoneos-arm64
 MEMO_CFVER           ?= 1700
 # iOS 13.0 == 1665.15.

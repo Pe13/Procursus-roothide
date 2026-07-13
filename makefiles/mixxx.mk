@@ -34,6 +34,34 @@ mixxx: setup mixxx-download-prebuilt-deps
 mixxx-remove-shared: $(MIXXX_DEPS)
 	rm $(BUILD_BASE)/*/.dylib
 
+mixxx-configure: mixxx-setup $(MIXXX_DEPS)
+	rm -rf $(BUILD_WORK)/mixxx/build
+	cmake -S $(BUILD_WORK)/mixxx -B $(BUILD_WORK)/mixxx/build \
+		$(DEFAULT_CMAKE_FLAGS) \
+		-DRIGHT_PROTOC="$(BUILD_WORK)/libprotobuf/build-host/protoc" \
+		-DCMAKE_PREFIX_PATH="$(BUILD_BASE)/usr/;$(TARGET_SYSROOT)/usr" \
+		-DCMAKE_FRAMEWORK_PATH="$(TARGET_SYSROOT)/Developer/Library/Frameworks;$(TARGET_SYSROOT)/System/Library/Frameworks" \
+		-DCMAKE_FIND_USE_CMAKE_PATH=ON \
+		-DCMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH=OFF \
+		-DCMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH=ON \
+		-DCMAKE_FIND_USE_CMAKE_SYSTEM_PATH=OFF \
+		-DCMAKE_FIND_USE_INSTALL_PREFIX=ON \
+		-DCMAKE_MAKE_PROGRAM="/usr/bin/ninja" \
+		-DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 \
+		-G"Ninja" \
+		-DIOS=ON \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DQT6=ON \
+		-DOPUS=ON \
+		-DMAD=ON \
+		-DMODPLUG=ON \
+		-DQTKEYCHAIN=OFF \
+		-DBATTERY=OFF \
+		-DBUILD_BENCH=OFF \
+		-DBUILD_TESTING=OFF \
+		-DQT_NO_SET_DEFAULT_IOS_LAUNCH_SCREEN=ON \
+		-DQT_NO_ADD_IOS_LAUNCH_SCREEN_TO_BUNDLE=ON
+
 ifneq ($(wildcard $(BUILD_WORK)/mixxx/.build_complete),)
 mixxx-build:
 	@echo "Using previously built mixxx."
@@ -70,12 +98,15 @@ endif
 		-DQTKEYCHAIN=OFF \
 		-DBATTERY=OFF \
 		-DBUILD_BENCH=OFF \
-		-DBUILD_TESTING=OFF
+		-DBUILD_TESTING=OFF \
+		-DQT_NO_SET_DEFAULT_IOS_LAUNCH_SCREEN=ON \
+		-DQT_NO_ADD_IOS_LAUNCH_SCREEN_TO_BUNDLE=ON
 	cmake --build $(BUILD_WORK)/mixxx/build --target mixxx --config RelWithDebInfo
 	# Tipa time
 	mkdir $(BUILD_WORK)/mixxx/Payload
-	cp -a $(BUILD_WORK)/mixxx/build/RelWithDebInfo-iphoneos/Mixxx.app $(BUILD_WORK)/mixxx/Payload
-	cp -a $(BUILD_WORK)/mixxx/build/RelWithDebInfo-iphoneos/Mixxx.app.dSYM $(BUILD_WORK)/mixxx/Payload
+	cp -a $(BUILD_WORK)/mixxx/build/Mixxx.app $(BUILD_WORK)/mixxx/Payload
+	cp -a $(BUILD_WORK)/mixxx/packaging/ios/Assets.xcassets/AppIcon.appiconset/1024x1024.png $(BUILD_WORK)/mixxx/Payload/Mixxx.app/Icon.png
+	[ ! -d $(BUILD_WORK)/mixxx/build/Mixxx.app.dSYM ] || cp -a $(BUILD_WORK)/mixxx/build/Mixxx.app.dSYM $(BUILD_WORK)/mixxx/Payload
 	cd $(BUILD_WORK)/mixxx/; zip -r Mixxx.tipa Payload
 	$(call AFTER_BUILD)
 endif
