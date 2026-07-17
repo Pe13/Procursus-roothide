@@ -783,6 +783,14 @@ EXTRACT_TAR = -if [ ! -d $(BUILD_WORK)/$(3) ] || [ "$(4)" = "1" ]; then \
 		rm -rf $(2); \
 	fi
 
+EXTRACT_ZIP = -if [ ! -d $(BUILD_WORK)/$(3) ] || [ "$(4)" = "1" ]; then \
+		cd $(BUILD_WORK) && \
+		UNZIP=-qq unzip $(BUILD_SOURCE)/$(1) && \
+		mkdir -p $(3); \
+		cp -a $(2)/. $(3); \
+		rm -rf $(2); \
+	fi
+
 DOWNLOAD_FILE = if [ ! -f "$(1)" ]; then \
 					echo "Downloading $(1)"; \
 					if [ -z "$$LIST" ]; then \

@@ -1,0 +1,45 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e927d32..acc93d8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -229,11 +229,19 @@ elseif(UNIX)
+ 
+   if(APPLE)
+     set(CMAKE_MACOSX_RPATH 1)
+-    target_sources(PortAudio PRIVATE
+-      src/hostapi/coreaudio/pa_mac_core.c
+-      src/hostapi/coreaudio/pa_mac_core_blocking.c
+-      src/hostapi/coreaudio/pa_mac_core_utilities.c
+-    )
++    if(IOS)
++      target_sources(PortAudio PRIVATE
++        src/hostapi/coreaudio_ios/pa_ios_core.c
++        src/hostapi/coreaudio_ios/pa_ios_core_blocking.c
++        src/hostapi/coreaudio_ios/pa_ios_core_utilities.c
++      )
++    else()
++      target_sources(PortAudio PRIVATE
++        src/hostapi/coreaudio/pa_mac_core.c
++        src/hostapi/coreaudio/pa_mac_core_blocking.c
++        src/hostapi/coreaudio/pa_mac_core_utilities.c
++      )
++    endif()
+     target_include_directories(PortAudio PRIVATE src/hostapi/coreaudio)
+     set(PORTAUDIO_PUBLIC_HEADERS "${PORTAUDIO_PUBLIC_HEADERS}" include/pa_mac_core.h)
+ 
+@@ -249,7 +257,11 @@ elseif(UNIX)
+       "${COREFOUNDATION_LIBRARY}"
+       "${CORESERVICES_LIBRARY}"
+     )
+-    target_compile_definitions(PortAudio PRIVATE PA_USE_COREAUDIO=1)
++    if(IOS)
++      target_compile_definitions(PortAudio PRIVATE PA_USE_COREAUDIO_IOS=1)
++    else()
++      target_compile_definitions(PortAudio PRIVATE PA_USE_COREAUDIO=1)
++    endif()
+     set(PKGCONFIG_LDFLAGS_PRIVATE
+       "${PKGCONFIG_LDFLAGS_PRIVATE} -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreFoundation -framework CoreServices")
+   else()
+-- 
+2.35.1
+

@@ -3,14 +3,14 @@ $(error Use the main Makefile)
 endif
 
 SUBPROJECTS          += portaudio
-PORTAUDIO_VERSION    := 19.7.0
-PORTAUDIO_DOWNLOAD_V := 190700_20210406
+PORTAUDIO_VERSION    := 19.8.0
+PORTAUDIO_COMMIT := 3364bca3c01a0aedf64ba5a5abeb8e7019717ffc
 DEB_PORTAUDIO_V      ?= $(PORTAUDIO_VERSION)
 
 portaudio-setup: setup
-	$(call DOWNLOAD_FILE,$(BUILD_SOURCE)/portaudio-$(PORTAUDIO_VERSION).tgz,http://files.portaudio.com/archives/pa_stable_v$(PORTAUDIO_DOWNLOAD_V).tgz)
-	$(call EXTRACT_TAR,portaudio-$(PORTAUDIO_VERSION).tgz,portaudio-$(PORTAUDIO_VERSION),portaudio)
-	$(call DO_PATCH,portaudio,portaudio,-p1)
+	$(call DOWNLOAD_FILE,$(BUILD_SOURCE)/portaudio-$(PORTAUDIO_VERSION).zip,https://github.com/Be-ing/portaudio/archive/$(PORTAUDIO_COMMIT).zip)
+	$(call EXTRACT_ZIP,portaudio-$(PORTAUDIO_VERSION).zip,portaudio-$(PORTAUDIO_COMMIT),portaudio)
+# 	$(call DO_PATCH,portaudio,portaudio,-p1)
 ifeq (,$(findstring darwin,$(MEMO_TARGET)))
 	$(call DO_PATCH,portaudio-ios,portaudio,-p1)
 endif
@@ -21,20 +21,10 @@ portaudio:
 	@echo "Using previously built portaudio."
 else
 portaudio: portaudio-setup
-	#	cd $(BUILD_WORK)/portaudio && autoreconf -fi
-	#	cd $(BUILD_WORK)/portaudio/bindings/cpp && autoreconf -fi
-	#	sed -i 's/-keep_private_externs -nostdlib/-keep_private_externs $(PLATFORM_VERSION_MIN) -arch $(MEMO_ARCH) -nostdlib/g' $(BUILD_WORK)/portaudio/{,bindings/cpp}/configure
-	#	cd $(BUILD_WORK)/portaudio && ./configure -C \
-	#		$(DEFAULT_CONFIGURE_FLAGS) \
-	#		--enable-cxx \
-	#		CC="$(CC) $(CFLAGS)"
-	#	+$(MAKE) -C $(BUILD_WORK)/portaudio lib/libportaudio.la
-	#	+$(MAKE) -C $(BUILD_WORK)/portaudio
-	#	+$(MAKE) -C $(BUILD_WORK)/portaudio install \
-	#		DESTDIR=$(BUILD_STAGE)/portaudio
 	cmake -S $(BUILD_WORK)/portaudio -B $(BUILD_WORK)/portaudio/build \
 		$(DEFAULT_CMAKE_FLAGS) \
-		-DPA_BUILD_SHARED=OFF
+		-DIOS=ON \
+		-DBUILD_SHARED_LIBS=OFF
 	+$(MAKE) -C $(BUILD_WORK)/portaudio/build
 	+$(MAKE) -C $(BUILD_WORK)/portaudio/build install \
 		DESTDIR="$(BUILD_STAGE)/portaudio"
