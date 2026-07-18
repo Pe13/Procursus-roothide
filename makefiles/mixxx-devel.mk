@@ -11,7 +11,7 @@ MIXXX_DEPS = chromaprint ffmpeg flac fftw googletest hidapi libdjinterop libebur
 mixxx-devel-setup: setup
 	$(call GIT_CLONE,https://github.com/Pe13/mixxx.git,ios,mixxx-devel)
 
-mixxx-configure: mixxx-devel-setup $(MIXXX_DEPS)
+mixxx-devel-configure: mixxx-devel-setup $(MIXXX_DEPS)
 ifneq ($(UNAME),Linux)
 	# WARNING: this action should be undone if you need to build a package that is not Mixxx
 	if [ ! -d $(BUILD_BASE)$(MEMO_PREFIX)$(MEMO_SUB_PREFIX)/include/c++ ]; then \
@@ -48,13 +48,13 @@ endif
 		-DQT_NO_ADD_IOS_LAUNCH_SCREEN_TO_BUNDLE=ON
 
 
-mixxx-build: mixxx-devel-setup
+mixxx-devel-build: mixxx-devel-setup
 	cmake --build $(BUILD_WORK)/mixxx-devel/cmake-build-relwithdebinfo --target mixxx --config RelWithDebInfo
 
 	$(call AFTER_BUILD)
 
 
-mixxx-package:
+mixxx-devel-package:
 	# Cleanup previous build artifacts if any
 	rm -rf $(BUILD_WORK)/mixxx-devel/Mixxx.tipa $(BUILD_WORK)/mixxx-devel/Payload
 
