@@ -998,6 +998,16 @@ GITHUB_ARCHIVE = -if [ "x$(5)" != "x" ]; then \
 							https://github.com/$(1)/$(2)/archive/$(4).tar.gz); \
 				fi
 
+GITHUB_RELEASE = -if [ "x$(5)" != "x" ]; then \
+	[ ! -f "$(BUILD_SOURCE)/$(5)-$(3).tar.gz" ] && \
+		$(call DOWNLOAD_FILE,$(BUILD_SOURCE)/$(5)-$(3).tar.gz, \
+			https://github.com/$(1)/$(2)/releases/download/$(4)/$(5)-$(3).tar.gz); \
+else \
+	[ ! -f "$(BUILD_SOURCE)/$(2)-$(3).tar.gz" ] && \
+		$(call DOWNLOAD_FILE,$(BUILD_SOURCE)/$(2)-$(3).tar.gz, \
+			https://github.com/$(1)/$(2)/releases/download/$(4)/$(2)-$(3).tar.gz); \
+fi
+
 GIT_CLONE = if [ ! -d "$(BUILD_WORK)/$(3)" ]; then \
 				git clone -c advice.detachedHead=false --depth 1 --branch "$(2)" --recursive "$(1)" "$(BUILD_WORK)/$(3)"; \
 			fi
