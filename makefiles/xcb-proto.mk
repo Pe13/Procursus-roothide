@@ -10,6 +10,9 @@ xcb-proto-setup: setup
 	$(call DOWNLOAD_FILES,$(BUILD_SOURCE),http://xorg.freedesktop.org/archive/individual/proto/xcb-proto-$(XCBPROTO_VERSION).tar.gz{$(comma).sig})
 	$(call PGP_VERIFY,xcb-proto-$(XCBPROTO_VERSION).tar.gz)
 	$(call EXTRACT_TAR,xcb-proto-$(XCBPROTO_VERSION).tar.gz,xcb-proto-$(XCBPROTO_VERSION),xcb-proto)
+ifneq ($(call HAS_COMMAND,python -c "import imp"),1)
+	$(error Install imp module for Python 3. If your python version is 3.12 or higher you need an earlier version to build xcb-proto. You can use pyenv or uv to install an earlier version of python and set it as the local version for this project.)
+endif
 
 ifneq ($(wildcard $(BUILD_WORK)/xcb-proto/.build_complete),)
 xcb-proto:
