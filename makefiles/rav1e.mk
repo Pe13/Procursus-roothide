@@ -16,7 +16,7 @@ rav1e:
 	@echo "Using previously built rav1e."
 else
 rav1e: rav1e-setup aom dav1d
-ifneq ($(call HAS_COMMAND,cargo cbuild),1)
+ifneq ($(shell cargo cbuild --version &> /dev/null && echo 1),1)
 	$(error run "cargo install cargo-c" to build rav1e)
 endif
 	cd $(BUILD_WORK)/rav1e && unset CFLAGS CXXFLAGS ASFLAGS CPPFLAGS LDFLAGS && \
