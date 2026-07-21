@@ -77,7 +77,7 @@ qt-host: qt-setup
 		-developer-build \
 		-nomake tests
 	cmake --build $(BUILD_WORK)/qt/build-host --parallel --target host_tools
-	cmake --install $(BUILD_WORK)/qt/build-host
+	# cmake --install $(BUILD_WORK)/qt/build-host
 	touch $(BUILD_WORK)/qt/.host_build_complete
 endif
 
@@ -95,7 +95,7 @@ qt: qt-setup qt-host libpng16
 		-platform macx-ios-clang \
 		-release \
 		-static \
-		-qt-host-path $(BUILD_WORK)/qt/host-qt \
+		-qt-host-path $(BUILD_WORK)/qt/build-host \
 		-prefix $(BUILD_STAGE)/qt/$(MEMO_PREFIX)$(MEMO_SUB_PREFIX) \
 		$(SUBMODULES_FLAGS) \
 		-- \
