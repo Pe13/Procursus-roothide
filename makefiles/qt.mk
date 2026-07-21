@@ -73,8 +73,10 @@ qt-host: qt-setup
 		-qt-pcre \
 		-qt-harfbuzz \
 		$(SUBMODULES_FLAGS) \
-		-feature-assistant
-	cmake --build $(BUILD_WORK)/qt/build-host --parallel
+		-feature-assistant \
+		-developer-build \
+		-nomake tests
+	cmake --build $(BUILD_WORK)/qt/build-host --parallel --target host_tools
 	cmake --install $(BUILD_WORK)/qt/build-host
 	touch $(BUILD_WORK)/qt/.host_build_complete
 endif
