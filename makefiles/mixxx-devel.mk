@@ -75,11 +75,12 @@ mixxx-devel-package:
 	cd $(BUILD_WORK)/mixxx-devel/ && \
 		zip -r Mixxx.tipa Payload
 
-mixxx-install: mixxx-package
 ifeq ($(DEVICE_IP),)
+mixxx-install:
 	@echo "DEVICE_IP is not set. Please set it to the IP address of your iOS device in the make invokation."
 	@exit 1
 else
+mixxx-install: mixxx-devel-package
 	# You need to run "nohup python3 -m http.server 8000 --directory /var/mobile" once on your iOS device before running this command.
 	scp $(BUILD_WORK)/mixxx-devel/Mixxx.tipa mobile@$(DEVICE_IP):/var/mobile/Mixxx.tipa
 	ssh mobile@$(DEVICE_IP) 'uiopen "apple-magnifier://install?url=http://127.0.0.1:8000/Mixxx.tipa"'
