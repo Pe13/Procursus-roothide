@@ -72,6 +72,8 @@ mixxx-devel-package:
 		$(BUILD_WORK)/mixxx-devel/Payload
 	cp -a $(BUILD_WORK)/mixxx-devel/packaging/ios/Assets.xcassets/AppIcon.appiconset/1024x1024.png \
 		$(BUILD_WORK)/mixxx-devel/Payload/Mixxx.app/Icon.png
+	# Strip the executable in the tipa
+	$(STRIP) $(BUILD_WORK)/mixxx-devel/Payload/Mixxx.app/Mixxx
 	cd $(BUILD_WORK)/mixxx-devel/ && \
 		zip -r Mixxx.tipa Payload
 

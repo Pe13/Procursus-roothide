@@ -1,0 +1,69 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e927d32..33051e1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -229,11 +229,20 @@ elseif(UNIX)
+ 
+   if(APPLE)
+     set(CMAKE_MACOSX_RPATH 1)
+-    target_sources(PortAudio PRIVATE
+-      src/hostapi/coreaudio/pa_mac_core.c
+-      src/hostapi/coreaudio/pa_mac_core_blocking.c
+-      src/hostapi/coreaudio/pa_mac_core_utilities.c
+-    )
++    if(IOS)
++      target_sources(PortAudio PRIVATE
++        src/hostapi/coreaudio_ios/pa_ios_core.m
++        src/hostapi/coreaudio_ios/pa_ios_core_blocking.c
++        src/hostapi/coreaudio_ios/pa_ios_core_utilities.c
++      )
++      set_source_files_properties(src/hostapi/coreaudio_ios/pa_ios_core.c PROPERTIES COMPILE_FLAGS "-x objective-c")
++    else()
++      target_sources(PortAudio PRIVATE
++        src/hostapi/coreaudio/pa_mac_core.c
++        src/hostapi/coreaudio/pa_mac_core_blocking.c
++        src/hostapi/coreaudio/pa_mac_core_utilities.c
++      )
++    endif()
+     target_include_directories(PortAudio PRIVATE src/hostapi/coreaudio)
+     set(PORTAUDIO_PUBLIC_HEADERS "${PORTAUDIO_PUBLIC_HEADERS}" include/pa_mac_core.h)
+ 
+@@ -249,9 +258,22 @@ elseif(UNIX)
+       "${COREFOUNDATION_LIBRARY}"
+       "${CORESERVICES_LIBRARY}"
+     )
+-    target_compile_definitions(PortAudio PRIVATE PA_USE_COREAUDIO=1)
+-    set(PKGCONFIG_LDFLAGS_PRIVATE
+-      "${PKGCONFIG_LDFLAGS_PRIVATE} -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreFoundation -framework CoreServices")
++    if(IOS)
++      find_library(AVFOUNDATION_LIBRARY AVFoundation REQUIRED)
++      target_link_libraries(PortAudio PRIVATE "${AVFOUNDATION_LIBRARY}")
++    endif()
++    if(IOS)
++      target_compile_definitions(PortAudio PRIVATE PA_USE_COREAUDIO_IOS=1)
++    else()
++      target_compile_definitions(PortAudio PRIVATE PA_USE_COREAUDIO=1)
++    endif()
++    if(IOS)
++      set(PKGCONFIG_LDFLAGS_PRIVATE
++        "${PKGCONFIG_LDFLAGS_PRIVATE} -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreFoundation -framework CoreServices -framework AVFoundation")
++    else()
++      set(PKGCONFIG_LDFLAGS_PRIVATE
++        "${PKGCONFIG_LDFLAGS_PRIVATE} -framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreFoundation -framework CoreServices")
++    endif()
+   else()
+     # Some BSDs have a reimplementation of alsalib, so do not explicitly check for Linux.
+     find_package(ALSA)
+diff --git a/configure.in b/configure.in
+index 2291629..00e859f 100644
+--- a/configure.in
++++ b/configure.in
+@@ -214,7 +214,7 @@ case "${host_os}" in
+         AC_DEFINE(PA_USE_COREAUDIO,1)
+ 
+         CFLAGS="$CFLAGS -I\$(top_srcdir)/src/os/unix -Wno-deprecated -Werror"
+-        LIBS="-framework CoreAudio -framework AudioToolbox -framework AudioUnit -framework CoreFoundation -framework CoreServices"
++        LIBS="-framework CoreAudio -framework AudioToolbox -framework CoreFoundation -framework CoreServices"
+ 
+         if test "x$enable_mac_universal" = "xyes" ; then
+            mac_version_min="-mmacosx-version-min=10.6"

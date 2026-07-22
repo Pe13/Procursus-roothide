@@ -10,7 +10,6 @@ DEB_PORTAUDIO_V      ?= $(PORTAUDIO_VERSION)
 portaudio-setup: setup
 	$(call DOWNLOAD_FILE,$(BUILD_SOURCE)/portaudio-$(PORTAUDIO_VERSION).zip,https://github.com/Be-ing/portaudio/archive/$(PORTAUDIO_COMMIT).zip)
 	$(call EXTRACT_ZIP,portaudio-$(PORTAUDIO_VERSION).zip,portaudio-$(PORTAUDIO_COMMIT),portaudio)
-# 	$(call DO_PATCH,portaudio,portaudio,-p1)
 ifeq (,$(findstring darwin,$(MEMO_TARGET)))
 	$(call DO_PATCH,portaudio-ios,portaudio,-p1)
 endif
